@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# LaTeX build artefacts (Overleaf builds the PDFs; submitted PDFs are committed explicitly)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store

@@ -1,0 +1,5 @@
+# Raw material (articles, PDFs, notes, slides) stays local and untracked.
+# Summarise it into docs/sources/ — only the summaries are committed.
+*
+!.gitignore
+!README.md

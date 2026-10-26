@@ -1,0 +1,30 @@
+name: Decision
+description: A question the team must decide, which will be recorded as an ADR
+title: "[Decision] "
+labels: ["decision"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What needs deciding? Link the open question (Qn) if one exists.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options
+      placeholder: |
+        1. ... (pros / cons)
+        2. ... (pros / cons)
+    validations:
+      required: true
+  - type: input
+    id: deadline
+    attributes:
+      label: Decide by
+      description: Usually a Tuesday meeting date.
+  - type: markdown
+    attributes:
+      value: |
+        Once decided, run `just adr "Title"`, fill it in, and link the PR here.

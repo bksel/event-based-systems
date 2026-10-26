@@ -1,0 +1,47 @@
+name: Task
+description: A unit of planned work (part of T1–T8)
+title: "[T?] "
+labels: ["task"]
+body:
+  - type: dropdown
+    id: task
+    attributes:
+      label: Work package
+      options:
+        - T1 System analysis
+        - T2 Project proposal
+        - T3 Petri net model, EF, next_state
+        - T4 Safety and recoverability analysis
+        - T5 Simulator core
+        - T6 Fault and service scenarios, GUI
+        - T7 Prioritization policies, experiments
+        - T8 Final report and presentation
+        - Coordination
+    validations:
+      required: true
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Needed for milestone
+      options:
+        - M2 (01.12.2026)
+        - M3 (12.01.2027)
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done. Link KB pages, requirement IDs or open questions.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of done
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Estimate [h]

@@ -1,0 +1,31 @@
+[project]
+name = "espresso-supervisor"
+version = "0.1.0"
+description = "Supervisory event-based control of an automatic espresso machine (Event Based Control course project)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.7",
+]
+
+[tool.uv]
+# Not an installable package (yet); uv only manages the environment.
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["kbcheck", "newdoc"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tools"]
