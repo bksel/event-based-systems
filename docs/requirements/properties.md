@@ -42,7 +42,7 @@ priority order on `E_con ∩ EF(s)`.
 
 | ID | Conflict |
 |---|---|
-| C1 | Order of brewing and steaming in a cappuccino. One temperature switch either way, but different heating times. |
+| C1 | Boiler temperature after a cappuccino: switch back to `brew` at once, or stay at `steam` until a drink needs `brew`. The cappuccino order itself is fixed, brew then steam ([ADR 0009](../decisions/0009-fix-recipe-stages-and-completion-events.md)). |
 | C2 | Heating and grinding in parallel, or one after the other. |
 | C3 | Descaling once due: immediately, or after a period of inactivity. |
 | C4 | Rinsing after every milk drink, or after a batch. |

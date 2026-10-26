@@ -34,27 +34,28 @@ confirmation.
 
 ## `B(f)`: resources disabled by each fault
 
-**To be defined by the team (T3).** The proposal only gives examples:
+Decided in [ADR 0010](../decisions/0010-fault-classes-blocked-resources-and-fault-exits.md). `water_low` is a warning, not a fault, and blocks nothing.
 
-- `milk_empty` blocks cappuccino but not espresso.
-- `bin_full` blocks grinding but lets a drink that is already brewing finish.
-- `overheat`: no actuator may run (see [S4](../requirements/properties.md#safety)).
-
-| Fault | `B(f)` |
-|---|---|
-| `water_low` | |
-| `water_empty` | |
-| `beans_empty` | |
-| `milk_empty` | |
-| `bin_full` | |
-| `tray_full` | |
-| `brew_unit_removed` | |
-| `flow_error` | |
-| `overheat` | |
+| Fault | Class | `B(f)` | Blocks |
+|---|---|---|---|
+| `overheat` | stop | all actuators ([S5](../requirements/properties.md#safety)) | all drinks |
+| `water_empty` | stop | pump, boiler, steamer | all drinks |
+| `flow_error` | stop | pump | all drinks |
+| `brew_unit_removed` | stop | grinder, pump | all drinks |
+| `beans_empty` | stop | grinder | all drinks |
+| `bin_full` | finish | grinder ([S4](../requirements/properties.md#safety)) | all drinks |
+| `tray_full` | finish | pump | all drinks |
+| `milk_empty` | partial | steamer | cappuccino |
 
 ## Fault during a drink
 
-If a fault affects the drink in preparation, the mode becomes `fault` and the running operation
-stops. Otherwise the mode does not change. Special case from the proposal: `milk_empty` during a
-cappuccino. The controller finishes the espresso part, reports a partial drink, and must not block
-the machine. See [Q6](../open-questions.md#q6-partial-drinks) for the general rule.
+The class of the fault decides what happens to the drink in preparation:
+
+- **stop**: the running operation stops at once and the controller fires `abort_drink`.
+- **finish**: the current drink completes, and later drinks are blocked.
+- **partial**: `milk_empty` during a cappuccino. The controller finishes the espresso part, skips
+  or stops steaming, reports a partial drink, and does not block the machine (L3).
+
+A fault that does not affect the current drink only blocks future orders. The mode becomes
+`fault` only if no drink is available any more. Removing the cup while the pump or the steamer
+runs also aborts the drink. See [ADR 0010](../decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
