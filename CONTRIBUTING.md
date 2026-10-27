@@ -8,9 +8,21 @@
 3. **Commit** small, focused changes with messages in the imperative mood
    (`Add inhibitor arcs for overheat`). Put `#12` in the message or the PR to link the issue.
 4. **Run `just check`** before pushing.
-5. **Open a PR.** The template asks for the issue, a summary and a checklist. At least one other
+5. **Rebase onto `main` before merging.** Keep the feature branch up to date by rebasing it,
+   not by merging `main` into it:
+
+   ```sh
+   git fetch origin
+   git rebase origin/main
+   just check                              # re-run after resolving any conflicts
+   git push --force-with-lease             # a rebase rewrites history; only on your own branch
+   ```
+
+   If a rebase goes wrong, `git rebase --abort` returns you to where you started.
+6. **Open a PR.** The template asks for the issue, a summary and a checklist. At least one other
    team member reviews it. Merge with *squash and merge*.
-6. **Never push directly to `main`.**
+7. **Never push directly to `main`.** Never rebase or force-push `main`, or a branch somebody
+   else is working on.
 
 ## Knowledge base
 
