@@ -24,8 +24,9 @@ uv --version
 just --version
 ```
 
-**Windows:** run the commands from Git Bash, or install a POSIX shell. `just` recipes use `sh` by
-default. Also set `git config --global core.autocrlf input` to avoid line-ending noise.
+**Windows:** the justfile makes `just` run recipes in PowerShell, so no POSIX shell is needed
+(the error "could not find the shell / `sh`" comes from `just`, not `uv`). Also set
+`git config --global core.autocrlf input` to avoid line-ending noise.
 
 ## 2. Clone and install
 
