@@ -46,6 +46,8 @@ Any editor works. For VS Code, recommended extensions: *Python*, *Ruff* (charlie
 *markdownlint*, *LaTeX Workshop* (only if you build reports locally). Select `.venv/bin/python`
 as the interpreter.
 
+Optional: to use a free AI assistant in VS Code, see [AI-ASSISTANTS.md](AI-ASSISTANTS.md).
+
 ## 4. Daily commands
 
 | Command | What it does |
