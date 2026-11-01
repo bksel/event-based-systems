@@ -44,7 +44,8 @@ Nover = 200`. See [ADR 0011](../decisions/0011-bounds-for-analysis-and-simulatio
 See [ADR 0009](../decisions/0009-fix-recipe-stages-and-completion-events.md).
 
 The heating target says whether heating has started and to which temperature. It is set by
-`heat_to_brew` / `heat_to_steam` and cleared by `temp_reached` or `overheat`.
+`heat_to_brew` / `heat_to_steam` and cleared by `temp_reached` or `overheat`
+([ADR 0012](../decisions/0012-simulator-architecture.md)).
 
 ## Not yet defined
 

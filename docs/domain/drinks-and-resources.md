@@ -12,7 +12,8 @@ R(k) ∩ ⋃_{f ∈ F} B(f) = ∅   and   d < Nover
 ```
 
 An order is in `EF(s)` whenever the machine is idle (`m ∈ {ready, fault}`, no current order).
-If `k` is available, preparation starts. Otherwise the controller answers with `reject_order`.
+If `k` is available, preparation starts. Otherwise the controller answers with `reject_order`
+([ADR 0012](../decisions/0012-simulator-architecture.md)).
 
 ## `R(k)`: required resources
 
