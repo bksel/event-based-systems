@@ -11,8 +11,8 @@ resources `B(f)`. Drink `k` is **available** in state `s` iff
 R(k) ∩ ⋃_{f ∈ F} B(f) = ∅   and   d < Nover
 ```
 
-An order for `k` is in `EF(s)` iff `m = ready` and `k` is available. Otherwise the controller
-answers with `reject_order`.
+An order is in `EF(s)` whenever the machine is idle (`m ∈ {ready, fault}`, no current order).
+If `k` is available, preparation starts. Otherwise the controller answers with `reject_order`.
 
 ## `R(k)`: required resources
 
