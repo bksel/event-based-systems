@@ -9,8 +9,8 @@ deciders: Bartosz Ksel, Krzysztof Pogoda, Maciej Smolarz, Polona Umek
 ## Context
 
 The machine has several resources that work concurrently (heating while grinding), shared
-resources (one boiler, one hydraulic path), bounded counters (grounds container, descaling) and
-faults that can be active together. We must prove safety and recoverability
+resources (one boiler, one hydraulic path), a bounded grounds-container counter and faults that
+can be active together. We must prove safety and recoverability
 ([properties](../requirements/properties.md)).
 
 ## Options considered

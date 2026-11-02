@@ -8,7 +8,7 @@ Each drink `k` has a set of required resources `R(k)`. Each fault `f ∈ 𝓕` d
 resources `B(f)`. Drink `k` is **available** in state `s` iff
 
 ```
-R(k) ∩ ⋃_{f ∈ F} B(f) = ∅   and   d < Nover
+R(k) ∩ ⋃_{f ∈ F} B(f) = ∅
 ```
 
 An order is in `EF(s)` whenever the machine is idle (`m ∈ {ready, fault}`, no current order).

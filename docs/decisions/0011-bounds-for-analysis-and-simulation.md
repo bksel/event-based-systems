@@ -8,9 +8,8 @@ deciders: Bartosz Ksel
 
 ## Context
 
-`Ng`, `Ndue` and `Nover` bound the counters `g` and `d`, so they set the size of the reachability
-graph ([Q2](../open-questions.md#q2-bounds)). Realistic values (hundreds of drinks between
-descalings) would make the graph far too large to analyse.
+`Ng` bounds the grounds counter `g`, so it affects the size of the reachability graph
+([Q2](../open-questions.md#q2-bounds)).
 
 ## Options considered
 
@@ -26,14 +25,12 @@ We choose option 2.
 | Bound | Analysis (net) | Simulation (default) |
 |---|---:|---:|
 | `Ng` | 3 | 10 |
-| `Ndue` | 2 | 150 |
-| `Nover` | 3 | 200 |
 
-The simulator takes the bounds as parameters.
+The simulator takes `Ng` as a parameter.
 
 ## Consequences
 
-- Safety and recoverability are proved on the small net. The bounds change only how many drinks
-  pass before the `bin_full` and descaling guards fire, not the structure of the net. The report
-  has to argue that this is why the results carry over to the simulation values.
+- Safety and recoverability are proved on the small net. The bound changes how many drinks pass
+  before the `bin_full` guard fires, not the structure of the net. The report has to argue that
+  this is why the results carry over to the simulation value.
 - The reduced nets go in `model/variants/`.

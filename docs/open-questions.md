@@ -22,22 +22,22 @@ is reformulated. See [ADR 0009](decisions/0009-fix-recipe-stages-and-completion-
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-Values of `Ng`, `Ndue`, `Nover`. They determine the size of the reachability graph, so use small
-values for analysis (e.g. `Ng = 3`) and realistic ones in the simulator?
+What value of `Ng` should be used for analysis and for the simulator? It determines the size of
+the reachability graph, so use a small value for analysis (e.g. `Ng = 3`) and a realistic one in
+the simulator?
 
-**Answer:** analysis `Ng = 3, Ndue = 2, Nover = 3`, simulation `Ng = 10, Ndue = 150, Nover = 200`
-(parameters). See [ADR 0011](decisions/0011-bounds-for-analysis-and-simulation.md).
+**Answer:** analysis `Ng = 3`, simulation `Ng = 10` (parameter). See
+[ADR 0011](decisions/0011-bounds-for-analysis-and-simulation.md).
 
 ## Q3. Missing completion events
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-`add_hot_water`, `eject_grounds`, `start_rinse`, `start_milk_cleaning` and `start_descaling` have
-no completion event in `E_obs`. Should we add `hot_water_done`, `rinse_done`, …, or treat these
-operations as instantaneous?
+`add_hot_water`, `eject_grounds`, `start_rinse` and `start_milk_cleaning` have no completion event
+in `E_obs`. Should we add completion events or treat these operations as instantaneous?
 
-**Answer:** add `hot_water_done`, `rinse_done`, `milk_cleaning_done` and `descaling_done`.
-`eject_grounds` is instantaneous. See
+**Answer:** add `hot_water_done`, `rinse_done` and `milk_cleaning_done`. `eject_grounds` is
+instantaneous. See
 [ADR 0009](decisions/0009-fix-recipe-stages-and-completion-events.md).
 
 ## Q4. Faults without a service event

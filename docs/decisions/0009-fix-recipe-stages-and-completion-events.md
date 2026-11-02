@@ -9,7 +9,7 @@ deciders: Bartosz Ksel
 ## Context
 
 The order component `p` needs a stage for every drink before the order part of the net can be
-drawn ([Q1](../open-questions.md#q1-recipe-stages)). Five controllable events had no completion
+drawn ([Q1](../open-questions.md#q1-recipe-stages)). Several controllable events had no completion
 event, so their operations would either never end or have to be instantaneous
 ([Q3](../open-questions.md#q3-missing-completion-events)).
 
@@ -20,7 +20,7 @@ event, so their operations would either never end or have to be instantaneous
    cappuccino is made.
 2. **Cappuccino in a fixed order, coffee first and milk on top**: matches the real drink and gives
    a smaller net.
-3. **Instantaneous operations** for rinsing, cleaning, hot water and descaling: a smaller net, but
+3. **Instantaneous operations** for rinsing, cleaning and hot water: a smaller net, but
    the simulator cannot measure their duration (E1, E3).
 4. **A completion event for every operation that takes time**: more events, but every operation
    is visible in time.
@@ -46,11 +46,8 @@ Recipe stages (the stage part of `p`):
 - `done`: `eject_grounds` moves the puck to the grounds container (`g := g + 1`), then `p := ∅`
   and `m := ready`.
 
-New completion events in `E_obs`: `hot_water_done`, `rinse_done`, `milk_cleaning_done`,
-`descaling_done`. `eject_grounds` is instantaneous.
-
-Descaling runs in this order: `d ≥ Ndue` → the machine asks for descaling → the user adds the
-agent and confirms (`descaling_confirmed`) → `start_descaling` → `descaling_done` → `d := 0`.
+New completion events in `E_obs`: `hot_water_done`, `rinse_done` and `milk_cleaning_done`.
+`eject_grounds` is instantaneous.
 
 ## Consequences
 
@@ -58,6 +55,5 @@ agent and confirms (`descaling_confirmed`) → `start_descaling` → `descaling_
   temperature after a cappuccino: switch back to `brew` right away (faster next espresso, E1) or
   stay at `steam` until a drink needs `brew` (fewer switches if milk drinks follow, E2). The
   proposal described C1 the old way, so the M2 report must mention the change.
-- `d` is incremented at `brew_done`, so partial drinks count towards descaling.
 - [Events](../domain/events.md), [state](../domain/state.md) and
   [properties](../requirements/properties.md) are updated to match.
