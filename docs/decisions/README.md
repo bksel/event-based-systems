@@ -30,3 +30,4 @@ Allowed statuses: `proposed`, `accepted`, `rejected`, `deprecated`, `superseded`
 | [0009](0009-fix-recipe-stages-and-completion-events.md) | Fix recipe stages and completion events | proposed |
 | [0010](0010-fault-classes-blocked-resources-and-fault-exits.md) | Fault classes, blocked resources and fault exits | proposed |
 | [0011](0011-bounds-for-analysis-and-simulation.md) | Bounds for analysis and simulation | proposed |
+| [0012](0012-simulator-architecture.md) | Simulator architecture | proposed |

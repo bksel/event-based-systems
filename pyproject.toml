@@ -12,9 +12,14 @@ dev = [
     "ruff>=0.7",
 ]
 
-[tool.uv]
-# Not an installable package (yet); uv only manages the environment.
-package = false
+[build-system]
+requires = ["uv_build>=0.9"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# The simulator package lives in sim/espresso; uv sync installs it in editable mode.
+module-name = "espresso"
+module-root = "sim"
 
 [tool.ruff]
 line-length = 100
@@ -24,7 +29,7 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["kbcheck", "newdoc"]
+known-first-party = ["kbcheck", "newdoc", "espresso"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -7,7 +7,7 @@ The state is a tuple `s = (m, r, c, d, F, p) ∈ S`.
 | Symbol | Meaning | Domain |
 |---|---|---|
 | `m` | Operating mode | `off`, `heating`, `ready`, `preparing`, `fault`, `service`, `descaling` |
-| `r` | Resources | grinder, pump, steamer ∈ {`idle`, `busy`}; boiler ∈ {`cold`, `brew`, `steam`}; brew unit ∈ {`empty`, `loaded`, `used`}; cup ∈ {`absent`, `present`} |
+| `r` | Resources | grinder, pump, steamer ∈ {`idle`, `busy`}; boiler ∈ {`cold`, `brew`, `steam`}; heating target ∈ {none, `brew`, `steam`}; brew unit ∈ {`empty`, `loaded`, `used`}; cup ∈ {`absent`, `present`} |
 | `c` | Consumables | water ∈ {`ok`, `low`, `empty`}; beans, milk ∈ {`ok`, `empty`}; grounds counter `g ∈ {0..Ng}`; drip tray ∈ {`ok`, `full`} |
 | `d` | Descaling counter (drinks since the last descaling) | `{0..Nover}`, warning threshold `Ndue < Nover` |
 | `F` | Set of active faults (several can be active at once) | `F ⊆ 𝓕` |
@@ -42,6 +42,10 @@ Nover = 200`. See [ADR 0011](../decisions/0011-bounds-for-analysis-and-simulatio
 | Cappuccino | `heating → grinding → brewing → steam_heating → steaming → done` |
 
 See [ADR 0009](../decisions/0009-fix-recipe-stages-and-completion-events.md).
+
+The heating target says whether heating has started and to which temperature. It is set by
+`heat_to_brew` / `heat_to_steam` and cleared by `temp_reached` or `overheat`
+([ADR 0012](../decisions/0012-simulator-architecture.md)).
 
 ## Not yet defined
 

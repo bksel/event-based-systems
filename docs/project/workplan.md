@@ -21,7 +21,7 @@ time buffer.
 | T2 | Project proposal | 12.10–20.10 | all | 16 | `reports/proposal/` |
 | T3 | Petri net model, EF, next_state | 20.10–10.11 | BK, KP | 30 | `model/`, `docs/` |
 | T4 | Safety and recoverability analysis | 03.11–01.12 | KP | 25 | `model/`, `docs/requirements/` |
-| T5 | Simulator core (plant + controller) | 20.10–01.12 | MS | 40 | `sim/` |
+| T5 | Simulator core (plant + controller) | 20.10–01.12 | MS (architecture: BK) | 40 | `sim/` |
 | T6 | Fault and service scenarios, GUI | 17.11–15.12 | PU | 30 | `sim/` |
 | T7 | Prioritization policies, experiments | 24.11–15.12 | BK, MS | 25 | `sim/` |
 | T8 | Final report and presentation | 08.12–12.01 | all | 35 | `reports/final/` |
