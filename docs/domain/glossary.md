@@ -9,15 +9,13 @@
 | **`next_state(s, e)`** | Transition function. In the Petri net it is the firing rule. |
 | **`safe(s, e)`** | Extra guard on controllable events that checks actuator safety conditions on top of `EF(s)`. |
 | **`R(k)`** | Resources required by drink `k`. See [drinks and resources](drinks-and-resources.md). |
-| **`B(f)`** | Resources disabled by fault `f`. |
-| **Available drink** | A drink whose `R(k)` contains no blocked resource while `d < Nover`. |
+| **`B(f)`** | Resources unavailable to the operation affected by modeled fault `f`. |
+| **Resource check** | An arc guard evaluated when the corresponding operation starts. |
 | **`s0`** | Initial state (machine off, cold, full). See [state](state.md). |
-| **`sh`**, home state | `ready`, no order, no faults. Must be reachable from every reachable state. |
+| **`sh`**, home state | Powered on, no order, empty brew unit and cup, and no modeled fault. |
 | **Home marking** | A marking reachable from every reachable marking of the net. |
-| **Graceful degradation** | A fault blocks only the drinks that depend on the missing resource. |
-| **Partial drink** | A drink finished only in part because of a mid-drink fault, e.g. a cappuccino without milk. |
+| **One active drink** | The `drink_done` permit prevents a second order until completion. |
 | **`Ng`** | Capacity of the grounds container (number of pucks). |
-| **`Ndue`**, **`Nover`** | Descaling thresholds: warning at `Ndue`, drinks blocked at `Nover`. |
 | **P-invariant** | Weighting of places whose weighted token sum stays constant under every firing. Used to prove boundedness and mutual exclusion. |
 | **Reachability graph** | Graph of all markings reachable from the initial marking. Finite here because all counters are bounded. |
 | **Inhibitor arc** | Arc that enables a transition only when a place is *empty*. Used to model faults blocking transitions. |

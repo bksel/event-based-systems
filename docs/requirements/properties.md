@@ -13,8 +13,8 @@ No reachable state allows an unsafe actuation. `safe(s, e)` enforces this on top
 | S2 | The pump never runs without a cup. |
 | S3 | The steamer never runs without milk. |
 | S4 | The grinder never runs with a full grounds container. |
-| S5 | No actuator runs while `overheat` is active. |
-| S6 | A drink is never started unless every resource in `R(k)` is available. |
+| S5 | The pump, grinder, and steamer run only when their modeled resource permit is available. |
+| S6 | A second drink cannot be ordered while one is active. |
 
 ## Recoverability
 
@@ -22,7 +22,7 @@ No reachable state allows an unsafe actuation. `safe(s, e)` enforces this on top
 |---|---|
 | L1 | From every reachable state, the home state `sh` is reachable once the user performs the service actions for the active faults (`sh` is a home marking). |
 | L2 | The net is deadlock-free. |
-| L3 | A mid-drink fault (e.g. `milk_empty` during a cappuccino) does not block the machine. A partial drink is reported. |
+| L3 | Modeled resource faults have a corresponding refill or empty-bin transition and do not leave the net without a recovery path. |
 
 **Verification:** check both on the reachability graph (finite, because all counters are
 bounded) and support them with P-invariants.
@@ -44,8 +44,6 @@ priority order on `E_con ∩ EF(s)`.
 |---|---|
 | C1 | Boiler temperature after a cappuccino: switch back to `brew` at once, or stay at `steam` until a drink needs `brew`. The cappuccino order itself is fixed, brew then steam ([ADR 0009](../decisions/0009-fix-recipe-stages-and-completion-events.md)). |
 | C2 | Heating and grinding in parallel, or one after the other. |
-| C3 | Descaling once due: immediately, or after a period of inactivity. |
-| C4 | Rinsing after every milk drink, or after a batch. |
 
 At least two policies are compared: a **fixed-order baseline** and an **optimised policy**, using
 simulation with randomly generated orders and faults.
