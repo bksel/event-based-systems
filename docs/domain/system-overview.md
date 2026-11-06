@@ -14,15 +14,15 @@ events and service actions.
 | Grinder | Grinds beans into the brew unit | `idle`, `busy` |
 | Boiler (single) | Heats water to brew *or* steam temperature | `cold`, `brew`, `steam` |
 | Water pump | Pushes water through the brew unit / hot-water outlet | `idle`, `busy` |
-| Brewing unit | Holds the coffee puck. Removable by the user | `empty`, `loaded`, `used` |
+| Brewing unit | Holds the coffee puck. Fixed in the model | `empty`, `loaded`, `used` |
 | Milk pump + steam frother | Froths milk for cappuccino | `idle`, `busy` |
 
 The single boiler and the shared hydraulic path are the main **resource conflicts**.
 
 ## Sensors
 
-Water tank level, bean presence, milk presence, grounds container counter, drip tray level,
-brewing unit presence, boiler temperature, cup presence.
+Water tank level, bean presence, milk presence, grounds container counter, boiler temperature,
+and the fixed cup state.
 
 ## Menu
 
@@ -43,6 +43,6 @@ These three drinks together use every resource. At most **one drink is prepared 
   the service actions are done. It never gets stuck.
 - **Efficient**: the order of operations affects preparation time and how often the boiler
   changes temperature.
-- **Graceful degradation**: a fault blocks only the drinks that depend on the missing resource.
+- **Bounded resource behavior**: modeled resource faults are cleared by refill or emptying events.
 
 Formal versions of these goals are in [Properties](../requirements/properties.md).

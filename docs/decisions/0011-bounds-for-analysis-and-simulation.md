@@ -8,7 +8,7 @@ deciders: Bartosz Ksel
 
 ## Context
 
-`Ng` bounds the grounds counter `g`, so it affects the size of the reachability graph
+The grounds-bin capacity bounds the counter `g`, so it affects the size of the reachability graph
 ([Q2](../open-questions.md#q2-bounds)).
 
 ## Options considered
@@ -24,13 +24,12 @@ We choose option 2.
 
 | Bound | Analysis (net) | Simulation (default) |
 |---|---:|---:|
-| `Ng` | 3 | 10 |
+| Grounds/bin capacity | 5 slots in the net | 10 (simulator default) |
 
-The simulator takes `Ng` as a parameter.
+The simulator takes its bin capacity as a parameter.
 
 ## Consequences
 
-- Safety and recoverability are proved on the small net. The bound changes how many drinks pass
-  before the `bin_full` guard fires, not the structure of the net. The report has to argue that
-  this is why the results carry over to the simulation value.
+- The bound changes how many drinks pass before the `bin_full` guard fires, not the structure of
+   the net. The report has to account for the different net and simulator capacities.
 - The reduced nets go in `model/variants/`.

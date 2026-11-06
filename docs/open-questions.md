@@ -22,58 +22,49 @@ is reformulated. See [ADR 0009](decisions/0009-fix-recipe-stages-and-completion-
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-What value of `Ng` should be used for analysis and for the simulator? It determines the size of
-the reachability graph, so use a small value for analysis (e.g. `Ng = 3`) and a realistic one in
-the simulator?
+What grounds-bin capacity should be used in the model and simulator? It determines the size of
+the reachability graph, so use five slots in the model and a realistic value in the simulator?
 
-**Answer:** analysis `Ng = 3`, simulation `Ng = 10` (parameter). See
+**Answer:** the net uses five slots and the simulator defaults to ten (parameter). See
 [ADR 0011](decisions/0011-bounds-for-analysis-and-simulation.md).
 
 ## Q3. Missing completion events
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-`add_hot_water`, `eject_grounds`, `start_rinse` and `start_milk_cleaning` have no completion event
-in `E_obs`. Should we add completion events or treat these operations as instantaneous?
+`add_hot_water` and `eject_grounds` have no completion event in `E_obs`. Should hot water be
+instantaneous or receive a completion event?
 
-**Answer:** add `hot_water_done`, `rinse_done` and `milk_cleaning_done`. `eject_grounds` is
-instantaneous. See
+**Answer:** use `hot_water_done`; `eject_grounds` is instantaneous. Rinsing and milk cleaning are
+out of scope. See
 [ADR 0009](decisions/0009-fix-recipe-stages-and-completion-events.md).
 
-## Q4. Faults without a service event
+## Q4. Faults outside the model
 
 *Status:* resolved, ADR proposed · *Owner:* T3 / T6
 
-- `flow_error`: how is it cleared? Does the user need to do anything, or does the controller retry?
-- `overheat`: needs some way out, e.g. a `cooled_down` sensor event.
-- `water_low`: is it a fault in `F` (and which drinks does it block), or only a warning?
+The former `flow_error` and `overheat` cases are outside the current model.
 
-**Answer:** `flow_error` is cleared by a new service event `clear_flow_error`, and `overheat` by
-a new sensor event `cooled_down`. `water_low` is only a warning. See
+**Answer:** these fault classes are outside the current model. See
 [ADR 0010](decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
 
-## Q5. Cup removed mid-drink
+## Q5. Fixed cup and brew unit
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-`cup_removed` while the pump is running would violate [S2](requirements/properties.md#safety).
-Does the controller abort the drink, pause it, or is `cup_removed` treated as a fault?
+Can the cup or brew unit be removed during preparation?
 
-**Answer:** if the pump or the steamer is running, the controller fires `abort_drink`. Before
-brewing, the order waits for `cup_placed`. It is not a fault. See
-[ADR 0010](decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
+**Answer:** no. Both are fixed resources; the cup and brew unit are emptied by the normal recipe
+flow before another order.
 
-## Q6. Partial drinks
+## Q6. Resource fault behavior
 
 *Status:* resolved, ADR proposed · *Owner:* T3 / T4
 
-General rule for faults during a drink: which faults let the current stage finish (`bin_full`),
-which stop it immediately (`overheat`, `water_empty`), and which give a partial drink
-(`milk_empty`)? This depends on `B(f)` in [drinks and resources](domain/drinks-and-resources.md).
+What faults and service actions are represented by the model?
 
-**Answer:** stop and abort: `overheat`, `water_empty`, `flow_error`, `brew_unit_removed`,
-`beans_empty`. Finish the drink: `bin_full`, `tray_full`. Partial drink: `milk_empty` during a
-cappuccino. See [ADR 0010](decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
+**Answer:** `water_empty`, `beans_empty`, `milk_empty`, and `bin_full`, with their corresponding
+refill or emptying transitions. Other fault classes and partial-drink reporting are out of scope.
 
 ## Q7. Petri net tool
 
