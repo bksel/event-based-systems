@@ -1,6 +1,0 @@
-Model decisions incorporated into the documentation:
-
-1. A water fault does not change the boiler temperature.
-2. The brew unit cannot be removed and must be empty before a new order.
-3. The cup cannot be removed and must be empty before a new order.
-4. Tray mechanics are not part of the model.
