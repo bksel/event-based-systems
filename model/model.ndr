@@ -155,6 +155,7 @@ e boiler__brew heating_to_brew_end 1 n
 e heating_to_brew_end heating_to_brew_ended 1 n
 e heating_to_brew_end boiler__brew 1 n
 e bin_space_available CE__eject_grounds 1 n
+e fault__bin_full OE__bin_full ?-1 n
 e bin_space_available OE__bin_full ?-1 n
 e OE__bin_full fault__bin_full 1 n
 e fault__bin_full CE__empty_bin 1 n
