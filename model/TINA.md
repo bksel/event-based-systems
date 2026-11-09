@@ -150,3 +150,16 @@ struct -P model/model.ndr
   `doc/txt` folder.
 - Commit the results used in the reports to `model/analysis/` as text, together with the exact
   command that produced them.
+
+### Automatic checks
+
+`just check` runs [tests/test_petri_net.py](../tests/test_petri_net.py) on `model/model.ndr`.
+The tests are skipped if `tina` is not on `PATH`. They check that:
+
+- `tina -p` reports no skipped lines
+- the reachability graph is complete (under 200,000 states) and the net is bounded
+- there are no deadlocks (L2)
+- every transition can fire at least once
+
+To check another file, e.g. a reduced variant, run
+`PETRI_NET=model/variants/small.ndr just test -k petri`.
