@@ -1,0 +1,237 @@
+p 389.0 227.0 beans_available 4 n
+t 234.0 87.0 CE__beans_refill n 0 w n {} ne
+t 187.0 269.0 OE__beans_empty n 0 w n {} ne
+p 1282.0 443.0 machine__off 1 n
+t 1495.0 361.0 CE__power__on n 0 w n {} ne
+p 1570.0 639.0 boiler__cold 0 n
+p 60.0 154.0 fault__beans_empty 0 n
+p 958.0 519.0 recipe__grinding 0 n
+t 2150.0 1523.0 OE__water_empty n 0 w n {} ne
+t 1593.0 1017.0 CE__heating_to_brew n 0 w n {} ne
+p 675.0 283.0 grinding_started 0 n
+t 693.0 639.0 OE__grind__end n 0 w n {} ne
+t 624.0 488.0 CE__grind__start n 0 w n {} ne
+t 805.0 64.0 OE__grind__fail n 0 w n {} ne
+t 1291.0 996.0 heating_to_brew_end n 0 w n {} ne
+t 555.0 60.0 CE__grind_restart n 0 w n {} ne
+p 683.0 163.0 grind_failed 0 n
+p 753.0 1095.0 grinding_ended 0 n
+p 707.0 965.0 brew_unit__loaded 0 n
+t 945.0 1426.0 CE__brewing_start n 0 w n {} ne
+p 1187.0 1539.0 pump__idle 1 n
+p 1426.0 1681.0 brewing_started 0 n
+t 1508.0 1386.0 OE__brewing_end n 0 w n {} ne
+p 2097.0 1037.0 brewing_ended 0 n
+p 682.0 1583.0 cup__empty 1 n
+t 557.0 1772.0 CE__cup_empty n 0 w n {} ne
+p 763.0 1672.0 cup__full 0 n
+p 1211.0 1421.0 pump__busy 0 n
+p 1268.0 1135.0 recipe__brewing 0 n
+t 1664.0 1532.0 CE__brewing_restart n 0 w n {} ne
+t 1894.0 1911.0 OE__brewing_fail n 0 w n {} ne
+p 668.0 1374.0 brew_unit_used 0 n
+p 116.0 2101.0 fault__bin_full 0 n
+t 82.0 1882.0 CE__empty_bin n 0 w n {} ne
+t 197.0 1922.0 OE__bin_full n 0 w n {} ne
+t 582.0 1178.0 CE__eject_grounds n 0 w n {} ne
+p 870.0 738.0 brew_unit__empty 1 n
+p 1826.0 1766.0 brewing_failed 0 n
+t 2082.0 1622.0 CE__water_refill n 0 w n {} ne
+p 2204.0 1808.0 fault__water_empty 0 n
+p 1843.0 1324.0 water_available 1 n
+p 1640.0 907.0 boiler__brew 0 n
+t 1863.0 980.0 CE__cooling_to_brew n 0 w n {} ne
+t 2059.0 862.0 CE__heating_to_steam n 0 w n {} ne
+p 1883.0 772.0 recipe__steam_heating 0 n
+p 1434.0 810.0 recipe__heating_to_brew 0 n
+p 992.0 1213.0 heating_to_brew_ended 0 n
+t 2241.0 1119.0 heating_to_steam_end n 0 w n {} ne
+t 1233.0 2552.0 CE_milk_refill n 0 w n {} ne
+t 1128.0 2473.0 OE_mile_empty n 0 w n {} ne
+p 1534.0 1551.0 reciple__milk 0 n
+t 1635.0 2509.0 OE_steam_fail n 0 w n {} ne
+p 1708.0 2359.0 steam_failed 0 n
+t 1558.0 2129.0 CE_steam_restart n 0 w n {} ne
+t 1329.0 2024.0 OE__steam_end n 0 w n {} ne
+t 1661.0 1956.0 CE__steam_start n 0 w n {} ne
+p 1550.0 2289.0 steam_started 0 n
+p 1991.0 1544.0 heating_to_steam_ended 0 n
+p 1333.0 2310.0 milk_available 1 n
+p 1055.0 2657.0 fault_milk_empty 0 n
+p 1128.0 1805.0 steam_ended 0 n
+p 234.0 1643.0 bin_space_available 5 n
+t 1757.0 881.0 OE__espresso_done n 0 w n {} ne
+t 1639.0 1154.0 OE__americano_done n 0 w n {} ne
+t 1076.0 1339.0 OE__cappucino_done n 0 w n {} ne
+p 2247.0 881.0 boiler__steam 0 n
+t 1093.0 693.0 CE__order_espresso n 0 w n {} ne
+t 1240.0 625.0 CE__order_americano n 0 w n {} ne
+t 1283.0 784.0 CE_order_cappucino n 0 w n {} ne
+p 1139.0 970.0 drink_done 1 n
+p 1699.0 654.0 recipe__hot_water 0 n
+t 1980.0 1010.0 CE__add_hot_woter n 0 w n {} ne
+p 1932.0 1176.0 hot_water_ended 0 n
+e machine__off CE_order_cappucino ?-1 n
+e machine__off CE__order_americano ?-1 n
+e machine__off CE__order_espresso ?-1 n
+e reciple__milk OE__americano_done ?-1 n
+e recipe__steam_heating OE__americano_done ?-1 n
+e hot_water_ended OE__americano_done 1 n
+e CE__grind__start brew_unit__loaded 1 n
+e CE__brewing_start brew_unit_used 1 n
+e CE__cup_empty cup__empty 1 n
+e cup__full CE__cup_empty 1 n
+e CE__brewing_start cup__full 1 n
+e cup__empty CE__brewing_start 1 n
+e heating_to_brew_ended CE__brewing_start 1 n
+e OE__brewing_end brewing_ended 1 n
+e recipe__brewing OE__brewing_end 1 n
+e CE__brewing_restart 0.3271 186.9 recipe__brewing 0.9225 186.9 1 n
+e recipe__brewing 0.7793 186.9 CE__brewing_restart 0.4703 186.9 1 n
+e CE__brewing_restart 0.0892 91.5 water_available 0.6847 91.5 1 n
+e water_available 0.5892 91.5 CE__brewing_restart 0.1847 91.5 1 n
+e CE__brewing_restart brewing_started 1 n
+e brewing_failed CE__brewing_restart 1 n
+e OE__brewing_fail brewing_failed 1 n
+e brewing_started OE__brewing_end 1 n
+e OE__brewing_end 0.9814 113.6 water_available 0.5769 113.6 1 n
+e OE__brewing_fail 0.0033 108.9 fault__water_empty 0.5988 108.9 1 n
+e fault__water_empty 0.5033 108.9 OE__brewing_fail 0.0988 108.9 1 n
+e water_available 0.4814 113.6 OE__brewing_end 0.0769 113.6 1 n
+e brewing_started OE__brewing_fail 1 n
+e brew_unit__empty CE__grind__start 1 n
+e pump__busy OE__brewing_end 1 n
+e OE__brewing_end pump__idle 1 n
+e CE__brewing_start 0.8667 181.5 brewing_started 0.4781 181.5 1 n
+e CE__brewing_start pump__busy 1 n
+e pump__idle CE__brewing_start 1 n
+e CE__brewing_start 0.9623 301.3 water_available 0.5737 301.3 1 n
+e water_available 0.3429 301.3 CE__brewing_start 0.1931 301.3 1 n
+e CE__brewing_start 0.9814 144.9 recipe__brewing 0.7520 144.9 1 n
+e recipe__brewing 0.5690 144.9 CE__brewing_start 0.1645 144.9 1 n
+e grinding_ended CE__brewing_start 1 n
+e brew_unit__loaded 0.8816 172.9 CE__brewing_start 0.2701 172.9 1 n
+e CE__eject_grounds 0.1021 175.3 brew_unit__empty 0.7135 175.3 1 n
+e brew_unit_used CE__eject_grounds 1 n
+e grind_failed 0.6259 110.1 CE__grind__start 0.3169 110.1 ?-1 n
+e fault__beans_empty 0.9306 57.1 OE__beans_empty 0.3351 57.1 ?-1 n
+e OE__grind__fail grind_failed 1 n
+e grinding_started OE__grind__fail 1 n
+e OE__grind__end 0.8265 153.3 grinding_ended 0.2151 153.3 1 n
+e CE__water_refill 0.3019 127.3 water_available 0.9133 127.3 1 n
+e fault__water_empty CE__water_refill 1 n
+e OE__water_empty fault__water_empty 1 n
+e water_available OE__water_empty 1 n
+e recipe__grinding 0.5330 111.8 CE__grind__start 0.9375 111.8 1 n
+e CE__power__on boiler__cold 1 n
+e grinding_started OE__grind__end 1 n
+e CE__grind__start 0.1634 70.4 grinding_started 0.7589 70.4 1 n
+e beans_available CE__grind__start 1 n
+e CE__beans_refill beans_available 4 n
+e fault__beans_empty CE__beans_refill 1 n
+e beans_available OE__beans_empty ?-1 n
+e OE__beans_empty 0.4306 57.1 fault__beans_empty 0.8351 57.1 1 n
+e machine__off CE__power__on 1 n
+e boiler__cold CE__heating_to_brew 1 n
+e recipe__heating_to_brew 0.9020 87.0 CE__heating_to_brew 0.3065 87.0 1 n
+e water_available 0.5338 132.0 CE__heating_to_brew 0.6837 132.0 1 n
+e CE__heating_to_brew 0.9065 132.0 water_available 0.3110 132.0 1 n
+e CE__heating_to_brew boiler__brew 1 n
+e CE__grind__start 0.0330 111.8 recipe__grinding 0.4375 111.8 1 n
+e beans_available CE__grind_restart 1 n
+e recipe__grinding OE__grind__end 1 n
+e grind_failed CE__grind_restart 1 n
+e CE__grind_restart grinding_started 1 n
+e grinding_started 0.6634 70.4 CE__grind__start 0.2589 70.4 ?-1 n
+e CE__heating_to_brew 0.4020 87.0 recipe__heating_to_brew 0.8065 87.0 1 n
+e water_available 0.2885 114.9 CE__cooling_to_brew 0.6930 114.9 1 n
+e CE__cooling_to_brew 0.7885 114.9 water_available 0.1930 114.9 1 n
+e boiler__steam CE__cooling_to_brew 1 n
+e CE__cooling_to_brew boiler__brew 1 n
+e recipe__heating_to_brew 0.1150 153.8 CE__cooling_to_brew 0.2649 153.8 1 n
+e CE__cooling_to_brew 0.5354 153.8 recipe__heating_to_brew 0.8445 153.8 1 n
+e recipe__heating_to_brew heating_to_brew_end 1 n
+e boiler__brew 0.4920 120.1 heating_to_brew_end 0.0875 120.1 1 n
+e heating_to_brew_end heating_to_brew_ended 1 n
+e heating_to_brew_end 0.9920 120.1 boiler__brew 0.5875 120.1 1 n
+e bin_space_available CE__eject_grounds 1 n
+e fault__bin_full 0.2301 65.5 OE__bin_full 0.6346 65.5 ?-1 n
+e bin_space_available OE__bin_full ?-1 n
+e OE__bin_full 0.7301 65.5 fault__bin_full 0.1346 65.5 1 n
+e fault__bin_full CE__empty_bin 1 n
+e CE__empty_bin bin_space_available 5 n
+e drink_done 0.6046 198.2 CE__eject_grounds 0.0091 198.2 1 n
+e CE__eject_grounds 0.1524 198.2 drink_done 0.4614 198.2 1 n
+e brewing_ended CE__add_hot_woter 1 n
+e recipe__hot_water CE__add_hot_woter 1 n
+e water_available 0.2323 114.2 CE__add_hot_woter 0.6368 114.2 1 n
+e CE__add_hot_woter 0.8198 114.2 water_available 0.0492 114.2 1 n
+e CE__add_hot_woter hot_water_ended 1 n
+e CE__heating_to_steam 0.5849 170.0 water_available 0.2759 170.0 1 n
+e water_available 0.0849 170.0 CE__heating_to_steam 0.7759 170.0 1 n
+e boiler__brew 0.9613 140.5 CE__heating_to_steam 0.5727 140.5 1 n
+e CE__heating_to_steam boiler__steam 1 n
+e CE__heating_to_steam 0.3770 65.9 recipe__steam_heating 0.9725 65.9 1 n
+e recipe__steam_heating 0.8770 65.9 CE__heating_to_steam 0.4725 65.9 1 n
+e recipe__steam_heating heating_to_steam_end 1 n
+e heating_to_steam_end heating_to_steam_ended 1 n
+e milk_available OE_mile_empty 1 n
+e OE_mile_empty fault_milk_empty 1 n
+e fault_milk_empty CE_milk_refill 1 n
+e CE_milk_refill milk_available 1 n
+e reciple__milk 0.8461 141.5 CE__steam_start 0.2506 141.5 1 n
+e CE__steam_start 0.3461 141.5 reciple__milk 0.7506 141.5 1 n
+e reciple__milk OE__steam_end 1 n
+e CE__steam_start steam_started 1 n
+e steam_started OE__steam_end 1 n
+e OE__steam_end steam_ended 1 n
+e steam_started OE_steam_fail 1 n
+e OE_steam_fail steam_failed 1 n
+e steam_failed CE_steam_restart 1 n
+e CE_steam_restart steam_started 1 n
+e reciple__milk 0.8044 192.8 CE_steam_restart 0.2089 192.8 1 n
+e CE_steam_restart 0.3044 192.8 reciple__milk 0.7089 192.8 1 n
+e heating_to_steam_ended 0.5868 176.0 CE__steam_start 0.1982 176.0 1 n
+e milk_available 0.1788 160.9 CE__steam_start 0.5833 160.9 1 n
+e milk_available 0.1556 96.3 CE_steam_restart 0.5601 96.3 1 n
+e CE__steam_start 0.7663 160.9 milk_available 0.9958 160.9 1 n
+e CE_steam_restart 0.6556 96.3 milk_available 0.0601 96.3 1 n
+e milk_available 0.3000 95.3 OE__steam_end 0.7045 95.3 1 n
+e OE__steam_end 0.8000 95.3 milk_available 0.2045 95.3 1 n
+e brewing_ended 0.3758 124.7 OE__espresso_done 0.9872 124.7 1 n
+e recipe__hot_water OE__espresso_done ?-1 n
+e recipe__steam_heating OE__espresso_done ?-1 n
+e reciple__milk 0.1432 235.4 OE__espresso_done 0.7546 235.4 ?-1 n
+e steam_ended OE__cappucino_done 1 n
+e OE__espresso_done 0.4671 208.1 drink_done 0.0785 208.1 1 n
+e OE__americano_done 0.4996 177.6 drink_done 0.8882 177.6 1 n
+e OE__cappucino_done drink_done 1 n
+e drink_done CE__order_espresso 1 n
+e drink_done CE__order_americano 1 n
+e drink_done CE_order_cappucino 1 n
+e CE__order_espresso 0.0031 120.2 recipe__heating_to_brew 0.3917 120.2 1 n
+e CE__order_espresso recipe__grinding 1 n
+e CE__order_espresso recipe__brewing 1 n
+e CE__order_americano recipe__heating_to_brew 1 n
+e CE__order_americano recipe__grinding 1 n
+e CE__order_americano 0.7030 170.3 recipe__brewing 0.3144 170.3 1 n
+e CE_order_cappucino recipe__heating_to_brew 1 n
+e CE_order_cappucino recipe__grinding 1 n
+e CE_order_cappucino 0.6875 117.1 recipe__brewing 0.2989 117.1 1 n
+e CE__order_americano 0.9343 153.3 recipe__hot_water 0.5457 153.3 1 n
+e CE_order_cappucino 0.0589 200.0 recipe__steam_heating 0.4475 200.0 1 n
+e CE_order_cappucino 0.8958 269.0 reciple__milk 0.2048 269.0 1 n
+e CE__order_espresso 0.4839 75.8 brew_unit__empty 0.0794 75.8 1 n
+e brew_unit__empty 0.9839 75.8 CE__order_espresso 0.5794 75.8 1 n
+e CE__order_americano 0.4994 129.0 brew_unit__empty 0.0949 129.0 1 n
+e brew_unit__empty 0.9119 129.0 CE__order_americano 0.6825 129.0 1 n
+e CE_order_cappucino 0.4346 138.5 brew_unit__empty 0.0301 138.5 1 n
+e brew_unit__empty 0.9346 138.5 CE_order_cappucino 0.5301 138.5 1 n
+e brewing_ended heating_to_steam_end 1 n
+e CE__heating_to_steam 0.7363 59.7 brewing_ended 0.3318 59.7 1 n
+e brewing_ended 0.2363 59.7 CE__heating_to_steam 0.8318 59.7 1 n
+e boiler__steam 0.6982 79.4 heating_to_steam_end 0.2937 79.4 1 n
+e heating_to_steam_end 0.1982 79.4 boiler__steam 0.7937 79.4 1 n
+h model
+
+
