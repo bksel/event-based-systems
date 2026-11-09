@@ -25,9 +25,10 @@ Allowed statuses: `proposed`, `accepted`, `rejected`, `deprecated`, `superseded`
 | [0004](0004-one-drink-at-a-time.md) | Three-drink menu, one drink at a time | accepted |
 | [0005](0005-monorepo-with-uv-and-just.md) | Monorepo with uv, ruff, pytest and just | accepted |
 | [0006](0006-markdown-knowledge-base.md) | Plain Markdown knowledge base with an untracked inbox | accepted |
-| [0007](0007-petri-net-analysis-tool.md) | Choose the Petri net analysis tool | proposed |
+| [0007](0007-petri-net-analysis-tool.md) | Choose the Petri net analysis tool | accepted |
 | [0008](0008-reports-in-latex-via-overleaf.md) | Write reports in LaTeX on Overleaf, synced with the repo | accepted |
 | [0009](0009-fix-recipe-stages-and-completion-events.md) | Fix recipe stages and completion events | proposed |
 | [0010](0010-fault-classes-blocked-resources-and-fault-exits.md) | Fault classes, blocked resources and fault exits | proposed |
 | [0011](0011-bounds-for-analysis-and-simulation.md) | Bounds for analysis and simulation | proposed |
 | [0012](0012-simulator-architecture.md) | Simulator architecture | proposed |
+| [0013](0013-reduce-the-model-scope.md) | Reduce the model scope | proposed |

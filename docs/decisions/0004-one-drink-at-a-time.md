@@ -20,5 +20,4 @@ drink is prepared at a time (proposal Section 2).
 
 - `p` holds a single order. A request queue can be added later without changing the structure of
   the model.
-- The model has a single `drink_done` permit token. An order consumes it and completion returns
-  it, so a second drink cannot be ordered until the current drink is complete.
+- Orders arriving while `m ≠ ready` are rejected (`reject_order`).

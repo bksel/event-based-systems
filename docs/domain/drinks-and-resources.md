@@ -4,46 +4,59 @@ Source: project proposal, Sections 2 and 2.3.
 
 ## Availability rule
 
-Each drink `k` has a set of required resources `R(k)`. The model checks the resources at the
-operation that uses them; it does not reject an order based on the complete resource set.
+Each drink `k` has a set of required resources `R(k)`. Each fault `f ∈ 𝓕` disables a set of
+resources `B(f)`. Drink `k` is **available** in state `s` iff
 
 ```
-R(k) ∩ ⋃_{f ∈ F} B(f) = ∅
+R(k) ∩ ⋃_{f ∈ F} B(f) = ∅   and   d < Nover
 ```
 
-An order can be accepted only when the machine is powered on, the brew unit is empty, and no
-other order is active. The `drink_done` permit place enforces the one-drink-at-a-time rule.
+An order is in `EF(s)` whenever the machine is idle (`m ∈ {ready, fault}`, no current order).
+If `k` is available, preparation starts. Otherwise the controller answers with `reject_order`
+([ADR 0012](../decisions/0012-simulator-architecture.md)).
 
 ## `R(k)`: required resources
 
-The table lists the resources represented by the model.
+The first three rows come from the proposal. Everything marked *(inferred)* still needs the team's
+confirmation.
 
 | Resource | Espresso | Americano | Cappuccino |
 |---|:-:|:-:|:-:|
 | grinder | ✓ | ✓ | ✓ |
 | brew unit | ✓ | ✓ | ✓ |
 | boiler at `brew` | ✓ | ✓ | ✓ |
-| pump / water | ✓ | ✓ | ✓ |
-| beans | ✓ | ✓ | ✓ |
-| cup | ✓ | ✓ | ✓ |
+| pump / water *(inferred)* | ✓ | ✓ | ✓ |
+| beans *(inferred)* | ✓ | ✓ | ✓ |
+| cup *(inferred)* | ✓ | ✓ | ✓ |
 | hot water outlet | | ✓ | |
 | boiler at `steam` | | | ✓ |
 | milk pump + steamer | | | ✓ |
-| milk | | | ✓ |
+| milk *(inferred)* | | | ✓ |
 
 ## `B(f)`: resources disabled by each fault
 
-Decided in [ADR 0010](../decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
+Decided in [ADR 0010](../decisions/0010-fault-classes-blocked-resources-and-fault-exits.md). `water_low` is a warning, not a fault, and blocks nothing.
 
 | Fault | Class | `B(f)` | Blocks |
 |---|---|---|---|
-| `water_empty` | operation failure | pump, boiler, steamer | all affected operations |
-| `beans_empty` | operation failure | grinder | grinding |
-| `bin_full` | finish | grinder ([S4](../requirements/properties.md#safety)) | grinding/ejection |
-| `milk_empty` | operation failure | steamer | steaming |
+| `overheat` | stop | all actuators ([S5](../requirements/properties.md#safety)) | all drinks |
+| `water_empty` | stop | pump, boiler, steamer | all drinks |
+| `flow_error` | stop | pump | all drinks |
+| `brew_unit_removed` | stop | grinder, pump | all drinks |
+| `beans_empty` | stop | grinder | all drinks |
+| `bin_full` | finish | grinder ([S4](../requirements/properties.md#safety)) | all drinks |
+| `tray_full` | finish | pump | all drinks |
+| `milk_empty` | partial | steamer | cappuccino |
 
 ## Fault during a drink
 
-The model represents water, bean, milk, and bin faults through explicit failure and refill
-transitions. The brew unit and cup cannot be removed. The cup is emptied before the next order;
-the brew unit is returned to its empty state by grounds ejection. There is no tray mechanism.
+The class of the fault decides what happens to the drink in preparation:
+
+- **stop**: the running operation stops at once and the controller fires `abort_drink`.
+- **finish**: the current drink completes, and later drinks are blocked.
+- **partial**: `milk_empty` during a cappuccino. The controller finishes the espresso part, skips
+  or stops steaming, reports a partial drink, and does not block the machine (L3).
+
+A fault that does not affect the current drink only blocks future orders. The mode becomes
+`fault` only if no drink is available any more. Removing the cup while the pump or the steamer
+runs also aborts the drink. See [ADR 0010](../decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).

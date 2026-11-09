@@ -22,55 +22,66 @@ is reformulated. See [ADR 0009](decisions/0009-fix-recipe-stages-and-completion-
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-What grounds-bin capacity should be used in the model and simulator? It determines the size of
-the reachability graph, so use five slots in the model and a realistic value in the simulator?
+Values of `Ng`, `Ndue`, `Nover`. They determine the size of the reachability graph, so use small
+values for analysis (e.g. `Ng = 3`) and realistic ones in the simulator?
 
-**Answer:** the net uses five slots and the simulator defaults to ten (parameter). See
-[ADR 0011](decisions/0011-bounds-for-analysis-and-simulation.md).
+**Answer:** analysis `Ng = 3, Ndue = 2, Nover = 3`, simulation `Ng = 10, Ndue = 150, Nover = 200`
+(parameters). See [ADR 0011](decisions/0011-bounds-for-analysis-and-simulation.md).
 
 ## Q3. Missing completion events
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-`add_hot_water` and `eject_grounds` have no completion event in `E_obs`. Should hot water be
-instantaneous or receive a completion event?
+`add_hot_water`, `eject_grounds`, `start_rinse`, `start_milk_cleaning` and `start_descaling` have
+no completion event in `E_obs`. Should we add `hot_water_done`, `rinse_done`, …, or treat these
+operations as instantaneous?
 
-**Answer:** use `hot_water_done`; `eject_grounds` is instantaneous. Rinsing and milk cleaning are
-out of scope. See
+**Answer:** add `hot_water_done`, `rinse_done`, `milk_cleaning_done` and `descaling_done`.
+`eject_grounds` is instantaneous. See
 [ADR 0009](decisions/0009-fix-recipe-stages-and-completion-events.md).
 
-## Q4. Faults outside the model
+## Q4. Faults without a service event
 
 *Status:* resolved, ADR proposed · *Owner:* T3 / T6
 
-The former `flow_error` and `overheat` cases are outside the current model.
+- `flow_error`: how is it cleared? Does the user need to do anything, or does the controller retry?
+- `overheat`: needs some way out, e.g. a `cooled_down` sensor event.
+- `water_low`: is it a fault in `F` (and which drinks does it block), or only a warning?
 
-**Answer:** these fault classes are outside the current model. See
+**Answer:** `flow_error` is cleared by a new service event `clear_flow_error`, and `overheat` by
+a new sensor event `cooled_down`. `water_low` is only a warning. See
 [ADR 0010](decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
 
-## Q5. Fixed cup and brew unit
+## Q5. Cup removed mid-drink
 
 *Status:* resolved, ADR proposed · *Owner:* T3
 
-Can the cup or brew unit be removed during preparation?
+`cup_removed` while the pump is running would violate [S2](requirements/properties.md#safety).
+Does the controller abort the drink, pause it, or is `cup_removed` treated as a fault?
 
-**Answer:** no. Both are fixed resources; the cup and brew unit are emptied by the normal recipe
-flow before another order.
+**Answer:** if the pump or the steamer is running, the controller fires `abort_drink`. Before
+brewing, the order waits for `cup_placed`. It is not a fault. See
+[ADR 0010](decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
 
-## Q6. Resource fault behavior
+## Q6. Partial drinks
 
 *Status:* resolved, ADR proposed · *Owner:* T3 / T4
 
-What faults and service actions are represented by the model?
+General rule for faults during a drink: which faults let the current stage finish (`bin_full`),
+which stop it immediately (`overheat`, `water_empty`), and which give a partial drink
+(`milk_empty`)? This depends on `B(f)` in [drinks and resources](domain/drinks-and-resources.md).
 
-**Answer:** `water_empty`, `beans_empty`, `milk_empty`, and `bin_full`, with their corresponding
-refill or emptying transitions. Other fault classes and partial-drink reporting are out of scope.
+**Answer:** stop and abort: `overheat`, `water_empty`, `flow_error`, `brew_unit_removed`,
+`beans_empty`. Finish the drink: `bin_full`, `tray_full`. Partial drink: `milk_empty` during a
+cappuccino. See [ADR 0010](decisions/0010-fault-classes-blocked-resources-and-fault-exits.md).
 
 ## Q7. Petri net tool
 
-*Status:* open · *Owner:* KP
+*Status:* resolved · *Owner:* KP
 
 TINA or PIPE? See [ADR 0007](decisions/0007-petri-net-analysis-tool.md).
+
+**Answer:** Tina 4.0.0. See [ADR 0007](decisions/0007-petri-net-analysis-tool.md).
 
 ## Q8. Overleaf sync with a monorepo
 
@@ -79,3 +90,12 @@ TINA or PIPE? See [ADR 0007](decisions/0007-petri-net-analysis-tool.md).
 Overleaf's GitHub sync links a project to a *whole* repository, and it may need a premium (or
 institutional) account. Check what our accounts allow. See
 [ADR 0008](decisions/0008-reports-in-latex-via-overleaf.md).
+
+## Q9. Reduced model scope
+
+*Status:* open · *Owner:* BK (verify the net), then all
+
+KP's Petri net leaves out descaling, rinsing, milk cleaning, several faults, cup removal and
+order rejection. Do we reduce the agreed scope to match the net, or extend the net? This would
+change ADRs agreed with the supervisor. See
+[ADR 0013](decisions/0013-reduce-the-model-scope.md).

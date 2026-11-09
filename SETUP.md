@@ -65,11 +65,8 @@ Optional: to use a free AI assistant in VS Code, see [AI-ASSISTANTS.md](AI-ASSIS
 
 ## 5. Petri net tool
 
-To be decided in [ADR 0007](docs/decisions/0007-petri-net-analysis-tool.md). Installation
-instructions will be added here once the tool is chosen.
-
-- TINA: <https://projects.laas.fr/tina/>
-- PIPE: <https://pipe2.sourceforge.net/>
+The net is drawn and analysed in **Tina 4.0.0** ([ADR 0007](docs/decisions/0007-petri-net-analysis-tool.md)).
+Install it with [model/TINA.md](model/TINA.md), which also covers editing and analysing the net.
 
 ## Overleaf
 
