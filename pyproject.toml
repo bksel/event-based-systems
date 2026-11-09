@@ -29,7 +29,7 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["kbcheck", "newdoc", "espresso"]
+known-first-party = ["kbcheck", "newdoc", "ndrlayout", "espresso"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

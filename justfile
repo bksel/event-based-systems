@@ -32,6 +32,10 @@ fmt:
 test *args:
     uv run pytest {{args}}
 
+# Lay out the Petri net (force-directed), e.g. `just layout` or `just layout model/variant.ndr`
+layout file="model/model.ndr":
+    uv run python tools/ndrlayout.py {{quote(file)}} --in-place
+
 # New ADR from the template, e.g. `just adr "Use TINA for analysis"`
 adr title:
     uv run python tools/newdoc.py adr {{quote(title)}}

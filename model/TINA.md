@@ -101,6 +101,28 @@ nd model/model.ndr
   labels, so traces from the net can be compared with the simulator
   ([ADR 0003](../docs/decisions/0003-python-discrete-event-simulator.md)).
 
+### Automatic layout
+
+When the drawing gets messy, let the computer place the nodes. Close `nd` first:
+
+```sh
+just layout                      # model/model.ndr, in place
+uv run python tools/ndrlayout.py model/model.ndr -o laid.ndr --svg laid.svg   # try it first
+```
+
+This uses a force-directed layout, the same idea as Obsidian's graph view. Arcs pull nodes
+together, nodes push each other apart, and a weak gravity keeps the net compact, so connected
+parts of the net end up close together. Arcs stay straight, except where that would be
+unreadable. Two arcs between the same nodes bow apart, and an arc that would cross another node
+curves around it. Only positions and arc shapes change: the places, transitions, arcs and
+markings stay exactly the same. `--svg` writes a preview you can open in a browser.
+`--charge` (more negative means more spread out), `--gravity` and `--link-distance` tune it,
+and `--no-curves` keeps the arcs as they are.
+
+A curved arc is stored as `e <from> <angle> <radius> <to> <angle> <radius> <weight> n`: one
+control point near each end. The angle is a fraction of a turn, anticlockwise from "right"
+(0.25 is up), and the radius is in pixels.
+
 ## 4. Analyse
 
 Always run `tina -p` first. Then:
