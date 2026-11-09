@@ -71,9 +71,9 @@ p 2445.0 320.0 drink_done 1 n
 p 2455.0 835.0 recipe__hot_water 0 n
 t 2420.0 930.0 CE__add_hot_woter n 0 w n {} ne
 p 2610.0 805.0 hot_water_ended 0 n
-e CE_order_cappucino machine__off ?-1 n
-e CE__order_americano machine__off ?-1 n
-e CE__order_espresso machine__off ?-1 n
+e machine__off CE_order_cappucino ?-1 n
+e machine__off CE__order_americano ?-1 n
+e machine__off CE__order_espresso ?-1 n
 e reciple__milk OE__americano_done ?-1 n
 e recipe__steam_heating OE__americano_done ?-1 n
 e hot_water_ended OE__americano_done 1 n
