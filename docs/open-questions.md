@@ -99,3 +99,15 @@ KP's Petri net leaves out descaling, rinsing, milk cleaning, several faults, cup
 order rejection. Do we reduce the agreed scope to match the net, or extend the net? This would
 change ADRs agreed with the supervisor. See
 [ADR 0013](decisions/0013-reduce-the-model-scope.md).
+
+## Q10. Checking L1 with Tina
+
+*Status:* open · *Owner:* BK, KP (T4)
+
+Tina's "reversible" result means that the initial marking `s0` is a home marking. Our home state
+`sh` is not `s0`, because the machine starts `off` and never returns to it. How do we show that
+`sh` is reachable from every reachable marking
+([L1](requirements/properties.md#recoverability))? Options: a `selt` formula, or checking that all
+markings after power-on form one strongly connected component that contains `sh`. See
+[ADR 0007](decisions/0007-petri-net-analysis-tool.md) and the
+[net's verification status](../model/README.md#verification-status).
