@@ -28,6 +28,9 @@ fmt:
     uv run ruff check --fix .
     uv run ruff format .
 
+gui:
+    uv run gui-sim
+
 # Run tests, e.g. `just test -k anchor`
 test *args:
     uv run pytest {{args}}
