@@ -8,13 +8,10 @@ net, lay it out and analyse it is described in [TINA.md](TINA.md).
 
 ## Scope
 
-The net models a **reduced scope**, not the scope agreed in ADRs
-[0009](../docs/decisions/0009-fix-recipe-stages-and-completion-events.md)–[0011](../docs/decisions/0011-bounds-for-analysis-and-simulation.md):
+The net models the **reduced scope** accepted in
+[ADR 0013](../docs/decisions/0013-reduce-the-model-scope.md) ([Q9](../docs/open-questions.md#q9-reduced-model-scope)):
 there is no descaling, rinsing or milk cleaning, no order rejection, no cup removal, and only four
-faults. Whether the scope is reduced or the net is extended is **open**:
-[ADR 0013](../docs/decisions/0013-reduce-the-model-scope.md),
-[Q9](../docs/open-questions.md#q9-reduced-model-scope). Until that is settled, the
-[KB](../docs/README.md) describes the agreed scope, and the net differs from it.
+faults. The [KB](../docs/README.md) still describes the earlier scope until it is updated to match.
 
 ## Verification status
 

@@ -93,7 +93,7 @@ institutional) account. Check what our accounts allow. See
 
 ## Q9. Reduced model scope
 
-*Status:* open · *Owner:* BK (verify the net), then all
+*Status:* resolved, scope reduced ([ADR 0013](decisions/0013-reduce-the-model-scope.md)) · *Owner:* BK (verify the net), then all
 
 KP's Petri net leaves out descaling, rinsing, milk cleaning, several faults, cup removal and
 order rejection. Do we reduce the agreed scope to match the net, or extend the net? This would

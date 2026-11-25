@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 date: 2026-11-09
 deciders: Krzysztof Pogoda
 ---
@@ -57,8 +57,7 @@ will check whether the agreed scope can be modelled before the team decides.
 
 ## Decision
 
-Open, until BK has verified whether the agreed scope can be modelled. Then the team decides,
-and the decision is checked with the supervisor. See
+Accepted: we reduce the scope as proposed above (option 2). Recorded on 2026-11-25. See
 [Q9](../open-questions.md#q9-reduced-model-scope).
 
 ## Consequences
