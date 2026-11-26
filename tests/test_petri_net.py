@@ -176,3 +176,110 @@ def test_some_home_marking_is_reachable_from_everywhere(graph):  # L1, the stron
     bottom = [c for c in sccs if all(succ.get(s, set()) <= c for s in c)]
     assert len(bottom) == 1, f"{len(bottom)} components that cannot be left"
     assert bottom[0] & home, "the component that cannot be left has no home marking"
+
+
+# Safety, reduced scope (ADR 0013 rewords S5 and S6). Each property is a condition on every
+# reachable marking or on every edge of the graph. "Runs" means the operation's `*_started` place
+# is marked. Properties the net breaks today are xfail(strict=True): they are listed in the
+# model README as known issues and fixed in task A3b. When a fix lands, the test passes, strict
+# turns that into a failure, and the marker must be removed.
+ACTIVE_PREFIXES = ("recipe__",)
+ACTIVE_SUFFIXES = ("_started", "_ended", "_failed")
+
+
+def labelled_edges(report: str) -> list[tuple[int, str, int]]:
+    graph = section(report, "REACHABILITY GRAPH:", "LIVENESS ANALYSIS")
+    out = []
+    for m in re.finditer(r"^(\d+) -> (.*)$", graph, re.M):
+        for edge in m.group(2).split(", "):
+            transition, _, target = edge.rpartition("/")
+            out.append((int(m.group(1)), transition, int(target)))
+    return out
+
+
+def drink_active(tokens: dict[str, int]) -> bool:
+    return any(p.startswith(ACTIVE_PREFIXES) or p.endswith(ACTIVE_SUFFIXES) for p in tokens)
+
+
+def violations(marks, condition) -> list[dict[str, int]]:
+    return [tokens for tokens in marks.values() if condition(tokens)]
+
+
+def input_arcs(transition: str) -> set[str]:
+    """Places with an ordinary (not inhibitor) arc into the transition, read from the .ndr file."""
+    places = set()
+    for line in NET.read_text(encoding="utf-8").splitlines():
+        fields = line.split()
+        if fields[:1] != ["e"] or fields[-2].startswith("?"):
+            continue
+        names = [f for f in fields[1:-2] if not re.fullmatch(r"-?[\d.]+", f)]
+        if names[-1] == transition:
+            places.add(names[0])
+    return places
+
+
+@pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason="N8: water_empty does not stop the pump, OE__fail_brew does it later",
+)
+def test_s1_pump_never_runs_without_water(graph):
+    marks = graph[0]
+    bad = violations(marks, lambda m: "brewing_started" in m and "water_available" not in m)
+    assert not bad, f"{len(bad)} markings, e.g. {bad[0]}"
+
+
+def test_s2_pump_never_runs_without_a_cup(graph):
+    # The reduced scope has a fixed cup (ADR 0013): it is always there, empty or full.
+    marks = graph[0]
+    bad = violations(marks, lambda m: ("cup__empty" in m) == ("cup__full" in m))
+    assert not bad, f"{len(bad)} markings without exactly one cup state, e.g. {bad[0]}"
+
+
+@pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason="N8: milk_empty does not stop the steamer, OE__fail_steam does it later",
+)
+def test_s3_steamer_never_runs_without_milk(graph):
+    marks = graph[0]
+    bad = violations(marks, lambda m: "steam_started" in m and "milk_available" not in m)
+    assert not bad, f"{len(bad)} markings, e.g. {bad[0]}"
+
+
+@pytest.mark.xfail(
+    strict=True, raises=AssertionError, reason="N9: CE__start_grind does not check the grounds bin"
+)
+def test_s4_grinder_never_runs_with_a_full_grounds_container(graph):
+    marks = graph[0]
+    bad = violations(marks, lambda m: "grinding_started" in m and "bin_space_available" not in m)
+    assert not bad, f"{len(bad)} markings, e.g. {bad[0]}"
+
+
+@pytest.mark.parametrize(
+    ("transition", "permit"),
+    [
+        ("CE__start_grind", "beans_available"),
+        ("CE__restart_grind", "beans_available"),
+        ("CE__start_brew", "water_available"),
+        ("CE__restart_brew", "water_available"),
+        ("CE__add_hot_water", "water_available"),
+        ("CE__start_steam", "milk_available"),
+        ("CE__restart_steam", "milk_available"),
+    ],
+)
+def test_s5_operations_start_only_with_their_permit(transition, permit):
+    # S5 as reworded in ADR 0013, read as a guard on starting. That the permit stays available
+    # while the operation runs is S1 and S3.
+    assert permit in input_arcs(transition), f"{transition} does not take {permit}"
+
+
+def test_s6_no_order_while_a_drink_is_active(graph, reachability):
+    marks = graph[0]
+    _, report = reachability
+    bad = [
+        (t, marks[source])
+        for source, t, _ in labelled_edges(report)
+        if t.startswith("OE__order_") and drink_active(marks[source])
+    ]
+    assert not bad, f"{len(bad)} orders accepted during a drink, e.g. {bad[0]}"

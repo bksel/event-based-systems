@@ -17,7 +17,7 @@ Status: **todo**, **doing**, **done**, **blocked** (say on what).
 | A0 | Decide D1–D7 and record them ([ADR 0014](../decisions/0014-align-the-simulator-with-the-reduced-net.md)) | BK | 26.11 | | done |
 | A3a | Rename the net's transitions to the catalogue names (D1), `tests/test_petri_net.py` passes | BK | 27.11 | A0 | done |
 | A11 | Check L1 on the renamed net ([Q10](../open-questions.md#q10-checking-l1-with-tina)) | BK | 29.11 | A3a | done |
-| A12 | Write the safety properties as Tina formulas and check them. List the places not covered by P-invariants | BK | 29.11 | A3a | todo |
+| A12 | Write the safety properties as Tina formulas and check them. List the places not covered by P-invariants | BK | 29.11 | A3a | done |
 | A13 | `EF`, `next_state` and `safe` for the reduced scope, as definitions for the report | BK | 29.11 | A0 | todo |
 | A14 | M2 report: simulator section (what exists, what changes, from the plan) | MS | 30.11 | | todo |
 | A15 | M2 report: assemble, check and submit | BK | 01.12 | A11–A14 | todo |
@@ -29,7 +29,7 @@ Status: **todo**, **doing**, **done**, **blocked** (say on what).
 | ID | Task | Owner | Due | Needs | Status |
 |---|---|---|---|---|---|
 | A2 | Update the KB to the reduced scope: events, state, drinks and resources, properties, glossary | BK | 04.12 | A0 | todo |
-| A3b | Change the net according to D3 and D4, fix the [net's known issues](../../model/README.md#known-issues-open) N1–N4, N6, N7, verify it again, explain the P-invariants | KP | 08.12 | A3a | todo |
+| A3b | Change the net according to D3 and D4, fix the [net's known issues](../../model/README.md#known-issues-open) N1–N4, N6–N9, verify it again (the S1, S3 and S4 tests must then pass) | KP | 08.12 | A3a | todo |
 | A4 | Align the simulator with the net: events, drinks, state, params, model, policy, tests | BK | 08.12 | A2 | todo |
 | A5 | Replay tool: run a JSONL trace in Tina, one test trace per drink and per fault | BK, KP | 11.12 | A3b, A4 | todo |
 | A6 | GUI core: `Session`, `FakeSession`, main window ([GUI spec](../../sim/gui_specification.md) C1, C2) | BK | 08.12 | A4 | todo |

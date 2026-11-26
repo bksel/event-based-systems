@@ -26,6 +26,12 @@ faults. The [KB](../docs/README.md) still describes the earlier scope until it i
 | Every transition can fire | ✓ |
 | L1: a home marking is reachable from every marking | ✓ 61 home markings, every marking reaches one |
 | L1, strong form: one component that cannot be left, and it contains a home marking | ✓ 18,480 markings, 60 of the 61 home markings |
+| S1: the pump never runs without water | ✗ 504 markings (N8) |
+| S2: the pump never runs without a cup | ✓ the cup is always there (fixed cup) |
+| S3: the steamer never runs without milk | ✗ 168 markings (N8) |
+| S4: the grinder never runs with a full grounds container | ✗ 864 markings (N9) |
+| S5 (reworded): grinding, brewing, hot water and steaming start only with their permit | ✓ |
+| S6 (reworded): no order while a drink is active | ✓ |
 
 **L1** (checked on 2026-11-26, method from [Q10](../docs/open-questions.md#q10-checking-l1-with-tina)).
 The tests read the markings, the edges and the strongly connected components from Tina's
@@ -46,12 +52,42 @@ nothing is running and no fault is active. Results:
 - The net lets every transition fire, so "once the user performs the service actions" in L1 is
   covered: the service transitions are part of the graph.
 
-Not verified yet (**open**):
+**Safety** (checked on 2026-11-26, the reduced scope of
+[ADR 0013](../docs/decisions/0013-reduce-the-model-scope.md), which rewords S5 and S6). Each
+property is a condition on every reachable marking, or on every edge for S6. An operation
+**runs** while its `*_started` place is marked. S1, S3, S4 and S6 were also checked with `selt`
+on the same graph, with the same results:
 
-- **Safety S1–S6.** These are not yet written as properties that Tina can check (e.g. with
-  `selt`).
-- **P-invariants.** `struct` reports that the net is not covered by P-invariants. Which places are
-  not conserved, and whether that is intended, has not been checked.
+```text
+[] - (brewing_started /\ - water_available)      S1   FALSE
+[] - (steam_started /\ - milk_available)         S3   FALSE
+[] - (grinding_started /\ - bin_space_available) S4   FALSE
+[] - (drink_done /\ (recipe__brewing \/ recipe__grinding \/ recipe__heating_to_brew))  S6  TRUE
+```
+
+Shortest counterexamples from power-on (prefixes left out):
+
+- **S1:** `power_on → order_americano → heat_to_brew → start_grind → grind_done →
+  temp_reached_brew → start_brew → water_empty`. The pump runs without water until `fail_brew`
+  fires, and if `refill_water` comes first it never stops.
+- **S3:** the same pattern for a cappuccino: `… → start_steam → milk_empty`.
+- **S4:** five espressos fill the bin (`bin_space_available` reaches 0), and the next order
+  starts the grinder: `… → eject_grounds → order_americano → start_grind`.
+
+The tests for S1, S3 and S4 are marked as expected failures (`xfail`, strict) until the net is
+fixed (A3b on the [taskboard](../docs/project/taskboard.md)).
+
+**P-invariants** (`struct -P`). `struct` ignores inhibitor arcs, but they only block firing, so
+every invariant it finds also holds for this net. There are 13 P-semiflows. Among them, the pump,
+the cup and the boiler are each in exactly one state, and `pump__idle + brewing_started +
+brewing_failed = 1` (the pump counts as busy while a brew has failed, N7). Seven places are not
+covered, all by construction:
+
+- `beans_available`, `bin_space_available`, `fault__beans_empty`, `fault__bin_full`: a refill or
+  `empty_bin` restores a fixed number of tokens however many are left, so no weighted sum stays
+  constant. The net is still bounded, because the inhibitor arcs allow the fault only at 0.
+- `recipe__hot_water`, `recipe__milk`, `recipe__steam_heating`: only one kind of drink creates
+  each of them.
 
 ## Structure
 
@@ -89,7 +125,7 @@ Names ([ADR 0014](../docs/decisions/0014-align-the-simulator-with-the-reduced-ne
 
 ## Known issues (open)
 
-These were found in review. Fixing N1–N4, N6 and N7 is task A3b on the
+These were found in review and by the checks above. Fixing N1–N4 and N6–N9 is task A3b on the
 [taskboard](../docs/project/taskboard.md). ADR 0014 (D4) decides N4, N6 and N7.
 
 | ID | Issue | Conflicts with |
@@ -101,3 +137,5 @@ These were found in review. Fixing N1–N4, N6 and N7 is task A3b on the
 | N5 | Names did not match the [event catalogue](../docs/domain/events.md). **Fixed** on 2026-11-26 (ADR 0014, D1): transitions labelled with catalogue events, prefixes set from the catalogue, typos in place names fixed (`recipe__milk`, `fault__milk_empty`) | events |
 | N6 | `CE__restart_grind` takes another bean portion, so a failed grind loses its beans | ADR 0014, D4 |
 | N7 | After `OE__fail_brew` the pump stays `pump__busy` while the water is empty. ADR 0014 (D4) reads "busy" as "allocated" | S1 |
+| N8 | `OE__water_empty` and `OE__milk_empty` do not stop a running pump or steamer. That takes a separate `OE__fail_brew` / `OE__fail_steam`, and a refill can come first. Found by the S1 and S3 checks | S1, S3 |
+| N9 | `CE__start_grind` does not check `bin_space_available`, so the grinder starts with the grounds bin full. Found by the S4 check | S4 |
