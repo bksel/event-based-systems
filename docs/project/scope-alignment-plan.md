@@ -37,10 +37,10 @@ also lists N1–N3. ADR 0014 (D4) answers these.
 
 | # | Observation |
 |---|---|
-| N4 | `OE__fail_grind` and `OE__fail_steam` have no fault as input, so they can fire at any time. `OE__fail_brew` needs `fault__water_empty`. Should grinding fail only on `beans_empty`, and steaming only on `milk_empty`? |
+| N4 | `OE__fail_grind` and `OE__fail_steam` had no fault as input, so they could fire at any time (the steaming half is fixed with N8). `OE__fail_brew` needed `fault__water_empty`. Should grinding fail only on `beans_empty`, and steaming only on `milk_empty`? |
 | N5 | `power_on` and the orders were labelled `CE` (controllable), the catalogue has them as `E_obs`. Same for the refills (spec open point O4). Fixed by D1 |
 | N6 | `CE__restart_grind` takes another bean portion. Is a failed grind meant to lose its beans? |
-| N7 | After `OE__fail_brew` the pump stays `pump__busy` while water is empty. Is "busy" meant as "allocated"? The reworded S5 depends on it. |
+| N7 | After a brew fails on `water_empty` the pump stays `pump__busy` while water is empty. Is "busy" meant as "allocated"? The reworded S5 depends on it. |
 
 ## 3. Decisions (all decided, see ADR 0014)
 

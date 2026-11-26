@@ -21,15 +21,15 @@ faults. The [KB](../docs/README.md) still describes the earlier scope until it i
 | Check | Result |
 |---|---|
 | `tina -p`: the file parses with no skipped lines | ✓ |
-| Reachability graph complete and bounded | ✓ 18,716 states |
+| Reachability graph complete and bounded | ✓ 14,012 states |
 | No deadlocks (L2) | ✓ |
 | Every transition can fire | ✓ |
 | L1: a home marking is reachable from every marking | ✓ 61 home markings, every marking reaches one |
-| L1, strong form: one component that cannot be left, and it contains a home marking | ✓ 18,480 markings, 60 of the 61 home markings |
-| S1: the pump never runs without water | ✗ 504 markings (N8) |
+| L1, strong form: one component that cannot be left, and it contains a home marking | ✓ 13,776 markings, 60 of the 61 home markings |
+| S1: the pump never runs without water | ✓ (failed before N8 was fixed) |
 | S2: the pump never runs without a cup | ✓ the cup is always there (fixed cup) |
-| S3: the steamer never runs without milk | ✗ 168 markings (N8) |
-| S4: the grinder never runs with a full grounds container | ✗ 864 markings (N9) |
+| S3: the steamer never runs without milk | ✓ (failed before N8 was fixed) |
+| S4: the grinder never runs with a full grounds container | ✓ (failed before N9 was fixed) |
 | S5 (reworded): grinding, brewing, hot water and steaming start only with their permit | ✓ |
 | S6 (reworded): no order while a drink is active | ✓ |
 
@@ -40,8 +40,8 @@ reachability report. A **home marking** is one where only these places are marke
 each), and the counters and the boiler places (any value). So the machine is on, has no order,
 nothing is running and no fault is active. Results:
 
-- Every one of the 18,716 reachable markings can reach a home marking.
-- The graph has one component that cannot be left (18,480 markings). Every marking leads into
+- Every one of the 14,012 reachable markings can reach a home marking.
+- The graph has one component that cannot be left (13,776 markings). Every marking leads into
   it, so each of the 60 home markings inside it can be reached again from every reachable
   marking: it is a home marking of the net in Tina's sense.
 - The 61st home marking is the one right after `OE__power_on`, with the boiler `cold`. It is
@@ -55,27 +55,40 @@ nothing is running and no fault is active. Results:
 **Safety** (checked on 2026-11-26, the reduced scope of
 [ADR 0013](../docs/decisions/0013-reduce-the-model-scope.md), which rewords S5 and S6). Each
 property is a condition on every reachable marking, or on every edge for S6. An operation
-**runs** while its `*_started` place is marked. S1, S3, S4 and S6 were also checked with `selt`
-on the same graph, with the same results:
+**runs** while its `*_started` place is marked. S1, S3, S4 and S6 are also checked with `selt`
+on the same graph:
 
 ```text
-[] - (brewing_started /\ - water_available)      S1   FALSE
-[] - (steam_started /\ - milk_available)         S3   FALSE
-[] - (grinding_started /\ - bin_space_available) S4   FALSE
-[] - (drink_done /\ (recipe__brewing \/ recipe__grinding \/ recipe__heating_to_brew))  S6  TRUE
+property                                           first net   fixed net
+[] - (brewing_started /\ - water_available)      S1   FALSE       TRUE
+[] - (steam_started /\ - milk_available)         S3   FALSE       TRUE
+[] - (grinding_started /\ - bin_space_available) S4   FALSE       TRUE
+[] - (drink_done /\ (recipe__brewing \/ recipe__grinding \/ recipe__heating_to_brew))  S6  TRUE  TRUE
 ```
 
-Shortest counterexamples from power-on (prefixes left out):
+**Found and fixed.** The first check of the net (18,716 states) broke S1, S3 and S4. The
+shortest counterexamples from power-on were (prefixes left out):
 
 - **S1:** `power_on → order_americano → heat_to_brew → start_grind → grind_done →
-  temp_reached_brew → start_brew → water_empty`. The pump runs without water until `fail_brew`
-  fires, and if `refill_water` comes first it never stops.
-- **S3:** the same pattern for a cappuccino: `… → start_steam → milk_empty`.
-- **S4:** five espressos fill the bin (`bin_space_available` reaches 0), and the next order
-  starts the grinder: `… → eject_grounds → order_americano → start_grind`.
+  temp_reached_brew → start_brew → water_empty`. The pump kept running without water until a
+  separate `fail_brew` fired, and if `refill_water` came first it never stopped (N8).
+- **S3:** the same pattern for a cappuccino: `… → start_steam → milk_empty` (N8).
+- **S4:** five espressos filled the bin (`bin_space_available` reached 0), and the next order
+  started the grinder: `… → eject_grounds → order_americano → start_grind` (N9).
 
-The tests for S1, S3 and S4 are marked as expected failures (`xfail`, strict) until the net is
-fixed (A3b on the [taskboard](../docs/project/taskboard.md)).
+The fixes, on 2026-11-26:
+
+- **N8:** a fault now stops the operation in the same step. `water_empty` has two transitions:
+  `OE__water_empty` while no brew runs (an inhibitor arc from `brewing_started`), and
+  `OE__water_empty_brewing`, which also moves the brew to `brewing_failed`. `milk_empty` has the
+  same pair, `OE__milk_empty` and `OE__milk_empty_steaming`. The separate `fail_brew` and
+  `fail_steam` transitions are gone.
+- **N9:** `CE__start_grind` reads `bin_space_available`, so grinding needs a free slot in the
+  bin.
+
+After the fixes all checks pass: 14,012 states, no deadlocks, every transition can fire, L1 in
+both forms, S1–S6. The smaller graph is the effect of the fixes: the markings in which an
+operation ran dry are gone.
 
 **P-invariants** (`struct -P`). `struct` ignores inhibitor arcs, but they only block firing, so
 every invariant it finds also holds for this net. There are 13 P-semiflows. Among them, the pump,
@@ -98,8 +111,8 @@ covered, all by construction:
 | Heating stage | `recipe__heating_to_brew`, `heating_to_brew_ended`, `heating_to_steam_ended` | `OE__temp_reached_brew`, `OE__temp_reached_steam` |
 | Grinding | `beans_available` (4 tokens), `grinding_started`, `grinding_ended`, `grind_failed` | `CE__start_grind`, `OE__grind_done`, `OE__fail_grind`, `CE__restart_grind` |
 | Brew unit and grounds | `brew_unit__empty`, `brew_unit__loaded`, `brew_unit_used`, `bin_space_available` (5 tokens) | `CE__eject_grounds` |
-| Brewing | `pump__idle`, `pump__busy`, `cup__empty`, `cup__full`, `brewing_started`, `brewing_ended`, `brewing_failed` | `CE__start_brew`, `OE__brew_done`, `OE__fail_brew`, `CE__restart_brew`, `CE__empty_cup` |
-| Hot water and steam | `hot_water_ended`, `steam_started`, `steam_ended`, `steam_failed` | `CE__add_hot_water`, `CE__start_steam`, `OE__steam_done`, `OE__fail_steam`, `CE__restart_steam` |
+| Brewing | `pump__idle`, `pump__busy`, `cup__empty`, `cup__full`, `brewing_started`, `brewing_ended`, `brewing_failed` | `CE__start_brew`, `OE__brew_done`, `OE__water_empty_brewing`, `CE__restart_brew`, `CE__empty_cup` |
+| Hot water and steam | `hot_water_ended`, `steam_started`, `steam_ended`, `steam_failed` | `CE__add_hot_water`, `CE__start_steam`, `OE__steam_done`, `OE__milk_empty_steaming`, `CE__restart_steam` |
 | Drink completion | | `OE__drink_done_espresso`, `OE__drink_done_americano`, `OE__drink_done_cappuccino` |
 | Faults and service | `water_available`, `milk_available`, `fault__water_empty`, `fault__beans_empty`, `fault__milk_empty`, `fault__bin_full` | `OE__water_empty`, `OE__beans_empty`, `OE__milk_empty`, `OE__bin_full`, `OE__refill_water`, `OE__refill_beans`, `OE__refill_milk`, `OE__empty_bin` |
 
@@ -117,25 +130,28 @@ Names ([ADR 0014](../docs/decisions/0014-align-the-simulator-with-the-reduced-ne
   `OE__`: the user decides them, not the controller.
 - Names are unique. Where several transitions stand for one event, the name adds a suffix:
   `CE__heat_to_brew_from_steam` (label `heat_to_brew`), `OE__temp_reached_brew` and
-  `OE__temp_reached_steam` (label `temp_reached`), and `OE__drink_done_*` (label `drink_done`).
-- `fail_*`, `restart_*`, `drink_done` and `empty_cup` are not in the catalogue yet (A2 on the
+  `OE__temp_reached_steam` (label `temp_reached`), `OE__drink_done_*` (label `drink_done`),
+  `OE__water_empty_brewing` (label `water_empty`) and `OE__milk_empty_steaming` (label
+  `milk_empty`).
+- `fail_grind`, `restart_*`, `drink_done` and `empty_cup` are not in the catalogue yet (A2 on the
   [taskboard](../docs/project/taskboard.md)). A failure is a plant event (`OE__`), a restart is
   a controller decision (`CE__`), `drink_done` is a completion (`OE__`) and `empty_cup` is
   controllable (`CE__`).
 
 ## Known issues (open)
 
-These were found in review and by the checks above. Fixing N1–N4 and N6–N9 is task A3b on the
-[taskboard](../docs/project/taskboard.md). ADR 0014 (D4) decides N4, N6 and N7.
+These were found in review and by the checks above. N5, N8 and N9 are fixed. Fixing the others
+is task A3b on the [taskboard](../docs/project/taskboard.md). ADR 0014 (D4) decides N4, N6 and
+N7.
 
 | ID | Issue | Conflicts with |
 |---|---|---|
 | N1 | `CE__empty_cup` can fire in the middle of a drink, and `CE__add_hot_water` and `CE__start_steam` do not check the cup, so hot water or milk can go into an emptied cup | S2 |
 | N2 | `CE__add_hot_water` does not use the pump (`pump__idle` / `pump__busy`) | S1, S2 |
 | N3 | `OE__water_empty` and `OE__milk_empty` can fire before `OE__power_on` | [events](../docs/domain/events.md) |
-| N4 | `OE__fail_grind` and `OE__fail_steam` fire without any fault, and the `CE__restart_*` transitions have no counterpart in the KB | [ADR 0010](../docs/decisions/0010-fault-classes-blocked-resources-and-fault-exits.md) |
+| N4 | `OE__fail_grind` fires without any fault, and the `CE__restart_*` transitions have no counterpart in the KB. The steaming half (`fail_steam`) was fixed with N8 | [ADR 0010](../docs/decisions/0010-fault-classes-blocked-resources-and-fault-exits.md) |
 | N5 | Names did not match the [event catalogue](../docs/domain/events.md). **Fixed** on 2026-11-26 (ADR 0014, D1): transitions labelled with catalogue events, prefixes set from the catalogue, typos in place names fixed (`recipe__milk`, `fault__milk_empty`) | events |
 | N6 | `CE__restart_grind` takes another bean portion, so a failed grind loses its beans | ADR 0014, D4 |
-| N7 | After `OE__fail_brew` the pump stays `pump__busy` while the water is empty. ADR 0014 (D4) reads "busy" as "allocated" | S1 |
-| N8 | `OE__water_empty` and `OE__milk_empty` do not stop a running pump or steamer. That takes a separate `OE__fail_brew` / `OE__fail_steam`, and a refill can come first. Found by the S1 and S3 checks | S1, S3 |
-| N9 | `CE__start_grind` does not check `bin_space_available`, so the grinder starts with the grounds bin full. Found by the S4 check | S4 |
+| N7 | After `OE__water_empty_brewing` the pump stays `pump__busy` while the water is empty. ADR 0014 (D4) reads "busy" as "allocated" | S1 |
+| N8 | `OE__water_empty` and `OE__milk_empty` did not stop a running pump or steamer: that took a separate `fail_brew` / `fail_steam`, and a refill could come first. Found by the S1 and S3 checks. **Fixed** on 2026-11-26 | S1, S3 |
+| N9 | `CE__start_grind` did not check `bin_space_available`, so the grinder started with the grounds bin full. Found by the S4 check. **Fixed** on 2026-11-26 | S4 |

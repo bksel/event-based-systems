@@ -180,9 +180,9 @@ def test_some_home_marking_is_reachable_from_everywhere(graph):  # L1, the stron
 
 # Safety, reduced scope (ADR 0013 rewords S5 and S6). Each property is a condition on every
 # reachable marking or on every edge of the graph. "Runs" means the operation's `*_started` place
-# is marked. Properties the net breaks today are xfail(strict=True): they are listed in the
-# model README as known issues and fixed in task A3b. When a fix lands, the test passes, strict
-# turns that into a failure, and the marker must be removed.
+# is marked. If a net change breaks a property and the fix has to wait, mark its test
+# xfail(strict=True, raises=AssertionError) with the issue ID from the model README, so that the
+# fix is noticed when it lands.
 ACTIVE_PREFIXES = ("recipe__",)
 ACTIVE_SUFFIXES = ("_started", "_ended", "_failed")
 
@@ -218,11 +218,6 @@ def input_arcs(transition: str) -> set[str]:
     return places
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AssertionError,
-    reason="N8: water_empty does not stop the pump, OE__fail_brew does it later",
-)
 def test_s1_pump_never_runs_without_water(graph):
     marks = graph[0]
     bad = violations(marks, lambda m: "brewing_started" in m and "water_available" not in m)
@@ -236,20 +231,12 @@ def test_s2_pump_never_runs_without_a_cup(graph):
     assert not bad, f"{len(bad)} markings without exactly one cup state, e.g. {bad[0]}"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AssertionError,
-    reason="N8: milk_empty does not stop the steamer, OE__fail_steam does it later",
-)
 def test_s3_steamer_never_runs_without_milk(graph):
     marks = graph[0]
     bad = violations(marks, lambda m: "steam_started" in m and "milk_available" not in m)
     assert not bad, f"{len(bad)} markings, e.g. {bad[0]}"
 
 
-@pytest.mark.xfail(
-    strict=True, raises=AssertionError, reason="N9: CE__start_grind does not check the grounds bin"
-)
 def test_s4_grinder_never_runs_with_a_full_grounds_container(graph):
     marks = graph[0]
     bad = violations(marks, lambda m: "grinding_started" in m and "bin_space_available" not in m)

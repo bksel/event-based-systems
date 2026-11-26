@@ -29,7 +29,7 @@ Status: **todo**, **doing**, **done**, **blocked** (say on what).
 | ID | Task | Owner | Due | Needs | Status |
 |---|---|---|---|---|---|
 | A2 | Update the KB to the reduced scope: events, state, drinks and resources, properties, glossary | BK | 04.12 | A0 | todo |
-| A3b | Change the net according to D3 and D4, fix the [net's known issues](../../model/README.md#known-issues-open) N1–N4, N6–N9, verify it again (the S1, S3 and S4 tests must then pass) | KP | 08.12 | A3a | todo |
+| A3b | Change the net according to D3 and D4, fix the [net's known issues](../../model/README.md#known-issues-open) N1–N4, N6, N7, check that `tests/test_petri_net.py` still passes | KP | 08.12 | A3a | todo |
 | A4 | Align the simulator with the net: events, drinks, state, params, model, policy, tests | BK | 08.12 | A2 | todo |
 | A5 | Replay tool: run a JSONL trace in Tina, one test trace per drink and per fault | BK, KP | 11.12 | A3b, A4 | todo |
 | A6 | GUI core: `Session`, `FakeSession`, main window ([GUI spec](../../sim/gui_specification.md) C1, C2) | BK | 08.12 | A4 | todo |
@@ -46,3 +46,4 @@ Status: **todo**, **doing**, **done**, **blocked** (say on what).
 | – | GUI specification ([sim/gui_specification.md](../../sim/gui_specification.md)) | BK | 25.11 |
 | – | Accept the reduced scope ([ADR 0013](../decisions/0013-reduce-the-model-scope.md), Q9) | BK | 25.11 |
 | – | Scope alignment plan and Q11 | BK | 26.11 |
+| – | Fix net issues N8 and N9 found by the safety checks ([model README](../../model/README.md#verification-status)) | BK | 26.11 |

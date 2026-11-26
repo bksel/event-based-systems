@@ -56,6 +56,9 @@ We choose option 2, with these decisions:
 
 - The KB (events, state, drinks and resources, properties, glossary) is updated to the reduced
   scope after M2. Until then the M2 report is the reference.
+- N8 and N9, two defects found by the safety checks, are fixed before M2 (decided by BK on
+  2026-11-26), because the checks are automated and both fixes are small. The other net changes
+  of D3 and D4 stay after M2.
 - `model.ndr` changes twice: relabelled and renamed before M2, extended (D3, D4) after M2.
 - The simulator drops the removed events, modes and fault classes. Its tests change with it.
 - With one vocabulary, a trace replay in the net needs no mapping table.

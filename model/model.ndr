@@ -28,7 +28,7 @@ p 763.0 1672.0 cup__full 0 n
 p 1211.0 1421.0 pump__busy 0 n
 p 1268.0 1135.0 recipe__brewing 0 n
 t 1664.0 1532.0 CE__restart_brew n 0 w n restart_brew ne
-t 1894.0 1911.0 OE__fail_brew n 0 w n fail_brew ne
+t 1894.0 1911.0 OE__water_empty_brewing n 0 w n water_empty ne
 p 668.0 1374.0 brew_unit_used 0 n
 p 116.0 2101.0 fault__bin_full 0 n
 t 82.0 1882.0 OE__empty_bin n 0 w n empty_bin ne
@@ -49,7 +49,7 @@ t 2241.0 1119.0 OE__temp_reached_steam n 0 w n temp_reached ne
 t 1233.0 2552.0 OE__refill_milk n 0 w n refill_milk ne
 t 1128.0 2473.0 OE__milk_empty n 0 w n milk_empty ne
 p 1534.0 1551.0 recipe__milk 0 n
-t 1635.0 2509.0 OE__fail_steam n 0 w n fail_steam ne
+t 1635.0 2509.0 OE__milk_empty_steaming n 0 w n milk_empty ne
 p 1708.0 2359.0 steam_failed 0 n
 t 1558.0 2129.0 CE__restart_steam n 0 w n restart_steam ne
 t 1329.0 2024.0 OE__steam_done n 0 w n steam_done ne
@@ -92,13 +92,13 @@ e CE__restart_brew 0.0892 91.5 water_available 0.6847 91.5 1 n
 e water_available 0.5892 91.5 CE__restart_brew 0.1847 91.5 1 n
 e CE__restart_brew brewing_started 1 n
 e brewing_failed CE__restart_brew 1 n
-e OE__fail_brew brewing_failed 1 n
+e OE__water_empty_brewing brewing_failed 1 n
 e brewing_started OE__brew_done 1 n
 e OE__brew_done 0.9814 113.6 water_available 0.5769 113.6 1 n
-e OE__fail_brew 0.0033 108.9 fault__water_empty 0.5988 108.9 1 n
-e fault__water_empty 0.5033 108.9 OE__fail_brew 0.0988 108.9 1 n
+e OE__water_empty_brewing fault__water_empty 1 n
+e water_available OE__water_empty_brewing 1 n
 e water_available 0.4814 113.6 OE__brew_done 0.0769 113.6 1 n
-e brewing_started OE__fail_brew 1 n
+e brewing_started OE__water_empty_brewing 1 n
 e brew_unit__empty CE__start_grind 1 n
 e pump__busy OE__brew_done 1 n
 e OE__brew_done pump__idle 1 n
@@ -122,11 +122,14 @@ e OE__refill_water 0.3019 127.3 water_available 0.9133 127.3 1 n
 e fault__water_empty OE__refill_water 1 n
 e OE__water_empty fault__water_empty 1 n
 e water_available OE__water_empty 1 n
+e brewing_started OE__water_empty ?-1 n
 e recipe__grinding 0.5330 111.8 CE__start_grind 0.9375 111.8 1 n
 e OE__power_on boiler__cold 1 n
 e grinding_started OE__grind_done 1 n
 e CE__start_grind 0.1634 70.4 grinding_started 0.7589 70.4 1 n
 e beans_available CE__start_grind 1 n
+e bin_space_available CE__start_grind 1 n
+e CE__start_grind bin_space_available 1 n
 e OE__refill_beans beans_available 4 n
 e fault__beans_empty OE__refill_beans 1 n
 e beans_available OE__beans_empty ?-1 n
@@ -176,6 +179,7 @@ e recipe__steam_heating 0.8770 65.9 CE__heat_to_steam 0.4725 65.9 1 n
 e recipe__steam_heating OE__temp_reached_steam 1 n
 e OE__temp_reached_steam heating_to_steam_ended 1 n
 e milk_available OE__milk_empty 1 n
+e steam_started OE__milk_empty ?-1 n
 e OE__milk_empty fault__milk_empty 1 n
 e fault__milk_empty OE__refill_milk 1 n
 e OE__refill_milk milk_available 1 n
@@ -185,8 +189,10 @@ e recipe__milk OE__steam_done 1 n
 e CE__start_steam steam_started 1 n
 e steam_started OE__steam_done 1 n
 e OE__steam_done steam_ended 1 n
-e steam_started OE__fail_steam 1 n
-e OE__fail_steam steam_failed 1 n
+e steam_started OE__milk_empty_steaming 1 n
+e milk_available OE__milk_empty_steaming 1 n
+e OE__milk_empty_steaming steam_failed 1 n
+e OE__milk_empty_steaming fault__milk_empty 1 n
 e steam_failed CE__restart_steam 1 n
 e CE__restart_steam steam_started 1 n
 e recipe__milk 0.8044 192.8 CE__restart_steam 0.2089 192.8 1 n
