@@ -18,7 +18,7 @@ Status: **todo**, **doing**, **done**, **blocked** (say on what).
 | A3a | Rename the net's transitions to the catalogue names (D1), `tests/test_petri_net.py` passes | BK | 27.11 | A0 | done |
 | A11 | Check L1 on the renamed net ([Q10](../open-questions.md#q10-checking-l1-with-tina)) | BK | 29.11 | A3a | done |
 | A12 | Write the safety properties as Tina formulas and check them. List the places not covered by P-invariants | BK | 29.11 | A3a | done |
-| A13 | `EF`, `next_state` and `safe` for the reduced scope, as definitions for the report | BK | 29.11 | A0 | todo |
+| A13 | `EF`, `next_state` and `safe` for the reduced scope, as definitions for the report ([semantics](../domain/semantics.md)) | BK | 29.11 | A0 | done |
 | A14 | M2 report: simulator section (what exists, what changes, from the plan) | MS | 30.11 | | todo |
 | A15 | M2 report: assemble, check and submit | BK | 01.12 | A11–A14 | todo |
 | A16 | Message the team: decisions, this board, the report sections | BK | 27.11 | A0 | todo |

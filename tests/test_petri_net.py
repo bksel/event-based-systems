@@ -270,3 +270,25 @@ def test_s6_no_order_while_a_drink_is_active(graph, reachability):
         if t.startswith("OE__order_") and drink_active(marks[source])
     ]
     assert not bad, f"{len(bad)} orders accepted during a drink, e.g. {bad[0]}"
+
+
+def transition_labels() -> dict[str, str]:
+    """Transition name -> label, read from the .ndr file."""
+    out = {}
+    for line in NET.read_text(encoding="utf-8").splitlines():
+        fields = line.split()
+        if fields[:1] == ["t"]:
+            out[fields[3]] = fields[8]
+    return out
+
+
+def test_next_state_is_a_function(reachability):
+    # next_state(s, e) fires the transition labelled e. It is only well defined if no marking
+    # enables two transitions with the same label (docs/domain/semantics.md).
+    _, report = complete(reachability)
+    labels = transition_labels()
+    enabled: dict[tuple[int, str], set[str]] = {}
+    for source, transition, _ in labelled_edges(report):
+        enabled.setdefault((source, labels[transition]), set()).add(transition)
+    bad = {key: names for key, names in enabled.items() if len(names) > 1}
+    assert not bad, f"{len(bad)} markings enable two transitions with one label, e.g. {bad}"

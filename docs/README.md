@@ -12,6 +12,7 @@ Run `just kb` to check that links and ADRs are consistent.
 - [State](domain/state.md): the state tuple `s = (m, r, c, d, F, p)`, the initial and home states
 - [Events](domain/events.md): the catalogue of observable and controllable events, fault/service pairs
 - [Drinks and resources](domain/drinks-and-resources.md): `R(k)`, `B(f)`, drink availability
+- [Semantics](domain/semantics.md): `EF`, `next_state` and `safe` in the reduced scope, as the net defines them
 - [Glossary](domain/glossary.md)
 
 ## Requirements
