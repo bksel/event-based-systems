@@ -241,28 +241,12 @@ tools/netreplay.py replay a JSONL trace in Tina (C3)
 |---|---|---|
 | O1 | Do `beans_empty` and `bin_full` also happen on their own when the counters run out, or only from the injector? `water_empty` and `milk_empty` have no counter, so they need the injector either way. | team, with C0 |
 | O2 | After a fault, does the running drink continue once the fault is cleared (the net has `*_restart` transitions), or is it dropped? The GUI only shows what the model does. | team, with C0 |
-| O3 | Net transitions without a simulator event (`OE__espresso_done`, `OE__americano_done`, `OE__cappucino_done`, `CE__cup_empty`, `CE__cooling_to_brew`): add events to the model, or treat them as silent in the replay? | team, with C3 |
-| O4 | The net labels `power_on`, the orders and the refills as `CE__…` (controllable), the catalogue as `E_obs`. Which one is right should be settled before the M2 report. | team |
+| O3 | Net transitions without a simulator event. **Decided** in [ADR 0014](../docs/decisions/0014-align-the-simulator-with-the-reduced-net.md) (D3): `drink_done`, `empty_cup` and `hot_water_done` become events of both. | – |
+| O4 | Controllable or not for `power_on`, the orders and the refills. **Decided** in ADR 0014 (D1): the catalogue decides. | – |
 
-## Appendix A. Draft event → transition mapping
+## Appendix A. Event → transition mapping
 
-For C3. To be verified against `model/model.ndr`, and moved to the KB once agreed.
-
-| Simulator event | Net transition |
-|---|---|
-| `power_on` | `CE__power__on` |
-| `order_espresso` / `order_americano` / `order_cappuccino` | `CE__order_espresso` / `CE__order_americano` / `CE_order_cappucino` |
-| `heat_to_brew` / `heat_to_steam` | `CE__heating_to_brew` / `CE__heating_to_steam` |
-| `temp_reached` | `heating_to_brew_end` or `heating_to_steam_end`, by the heating target |
-| `start_grind` / `grind_done` | `CE__grind__start` / `OE__grind__end` |
-| `start_brew` / `brew_done` | `CE__brewing_start` / `OE__brewing_end` |
-| `add_hot_water` / `hot_water_done` | `CE__add_hot_woter` / (none, see O3) |
-| `start_steam` / `steam_done` | `CE__steam_start` / `OE__steam_end` |
-| `eject_grounds` | `CE__eject_grounds` |
-| `water_empty` / `beans_empty` / `milk_empty` / `bin_full` | `OE__water_empty` / `OE__beans_empty` / `OE_mile_empty` / `OE__bin_full` |
-| `refill_water` / `refill_beans` / `refill_milk` / `empty_bin` | `CE__water_refill` / `CE__beans_refill` / `CE_milk_refill` / `CE__empty_bin` |
-| (none) | `OE__grind__fail`, `OE__brewing_fail`, `OE_steam_fail` and the matching `*_restart`: depends on O2 |
-
-The net and the simulator may order grinding and heating differently: the simulator allows
-grinding during heating (conflict C2). The replay must accept every order the net allows, so
-this is checked in C3.
+Not needed any more. Since [ADR 0014](../docs/decisions/0014-align-the-simulator-with-the-reduced-net.md)
+(D1), each transition of the net is labelled with its catalogue event, so a trace is replayed by
+label. Where several transitions share a label, the names are listed in the
+[net's structure](../model/README.md#structure).

@@ -31,6 +31,8 @@ Run `just kb` to check that links and ADRs are consistent.
 ## Project
 
 - [Work plan](project/workplan.md): tasks, owners, milestones
+- [Taskboard](project/taskboard.md): who does what by when, kept current by BK
+- [Scope alignment plan](project/scope-alignment-plan.md): aligning the simulator with the reduced net (ADR 0013)
 - [Meeting notes](meetings/README.md)
 
 ## Writing rules
