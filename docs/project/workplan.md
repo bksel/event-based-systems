@@ -20,13 +20,16 @@ time buffer.
 | T1 | System analysis, components and events | 12.10–19.10 | BK | 8 | `docs/domain/` |
 | T2 | Project proposal | 12.10–20.10 | all | 16 | `reports/proposal/` |
 | T3 | Petri net model, EF, next_state | 20.10–10.11 | BK, KP | 30 | `model/`, `docs/` |
-| T4 | Safety and recoverability analysis | 03.11–01.12 | KP | 25 | `model/`, `docs/requirements/` |
+| T4 | Safety and recoverability analysis | 03.11–01.12 | BK until M2, then KP | 25 | `model/`, `docs/requirements/` |
 | T5 | Simulator core (plant + controller) | 20.10–01.12 | MS (architecture: BK) | 40 | `sim/` |
-| T6 | Fault and service scenarios, GUI | 17.11–15.12 | PU | 30 | `sim/` |
+| T6 | Fault and service scenarios, GUI | 17.11–05.01 | PU | 30 | `sim/` |
 | T7 | Prioritization policies, experiments | 24.11–15.12 | BK, MS | 25 | `sim/` |
 | T8 | Final report and presentation | 08.12–12.01 | all | 35 | `reports/final/` |
 | – | Meetings and coordination | whole project | all | 30 | `docs/meetings/` |
 | | | | | **239** | |
+
+T4 and T6 were changed on 26.11 ([ADR 0014](../decisions/0014-align-the-simulator-with-the-reduced-net.md), D7).
+The current tasks, owners and dates are on the [taskboard](taskboard.md).
 
 ## Milestones
 

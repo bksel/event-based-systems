@@ -94,3 +94,201 @@ def test_every_transition_can_fire(reachability):
     match = re.search(r"(\d+) dead transition\(s\)", report)
     assert match, report[-2000:]
     assert match.group(1) == "0", re.search(r"dead transition\(s\):.*", report).group(0)
+
+
+# L1: recoverability. Home state sh (docs/domain/state.md): switched on, no order, no faults.
+# As a marking: only these places are marked, the ones in HOME_ONE with one token each. The
+# counters and the boiler may have any value. A place not listed (a recipe stage, an operation
+# in progress, a fault) makes the marking not a home marking.
+HOME_ONE = {"drink_done", "brew_unit__empty", "cup__empty", "pump__idle"} | {
+    "water_available",
+    "milk_available",
+}
+HOME_ANY = {"beans_available", "bin_space_available", "boiler__cold", "boiler__brew"} | {
+    "boiler__steam"
+}
+
+
+def section(report: str, start: str, end: str) -> str:
+    begin = report.index(start)
+    return report[begin : report.index(end, begin)]
+
+
+def markings(report: str) -> dict[int, dict[str, int]]:
+    out = {}
+    for m in re.finditer(
+        r"^(\d+) : (.*)$", section(report, "MARKINGS:", "REACHABILITY GRAPH:"), re.M
+    ):
+        tokens = {}
+        for item in m.group(2).split():
+            place, _, n = item.partition("*")
+            tokens[place] = int(n or 1)
+        out[int(m.group(1))] = tokens
+    return out
+
+
+def successors(report: str) -> dict[int, set[int]]:
+    graph = section(report, "REACHABILITY GRAPH:", "LIVENESS ANALYSIS")
+    out = {}
+    for m in re.finditer(r"^(\d+) -> (.*)$", graph, re.M):
+        out[int(m.group(1))] = {int(edge.rpartition("/")[2]) for edge in m.group(2).split(", ")}
+    return out
+
+
+def components(report: str) -> list[set[int]]:
+    sccs = report[report.index("STRONG CONNECTED COMPONENTS:") :]
+    return [set(map(int, m.group(1).split())) for m in re.finditer(r"^\d+ : ([\d ]+)$", sccs, re.M)]
+
+
+def is_home(tokens: dict[str, int]) -> bool:
+    return set(tokens) <= HOME_ONE | HOME_ANY and all(tokens.get(p) == 1 for p in HOME_ONE)
+
+
+@pytest.fixture(scope="module")
+def graph(reachability):
+    _, report = complete(reachability)
+    marks = markings(report)
+    home = {s for s, tokens in marks.items() if is_home(tokens)}
+    return marks, successors(report), components(report), home
+
+
+def test_home_state_is_reachable_from_every_marking(graph):  # L1
+    marks, succ, _, home = graph
+    assert home, "no reachable marking is a home marking"
+    pred: dict[int, set[int]] = {s: set() for s in marks}
+    for s, targets in succ.items():
+        for t in targets:
+            pred[t].add(s)
+    reaches_home, todo = set(home), list(home)
+    while todo:
+        for p in pred[todo.pop()] - reaches_home:
+            reaches_home.add(p)
+            todo.append(p)
+    stuck = sorted(set(marks) - reaches_home)
+    assert not stuck, f"{len(stuck)} markings cannot reach sh, e.g. {marks[stuck[0]]}"
+
+
+def test_some_home_marking_is_reachable_from_everywhere(graph):  # L1, the strong form
+    # A finite graph always ends in a component it cannot leave. With exactly one such
+    # component, every marking can reach all of it, so a home marking in it is a home marking
+    # of the net in Tina's sense.
+    _, succ, sccs, home = graph
+    bottom = [c for c in sccs if all(succ.get(s, set()) <= c for s in c)]
+    assert len(bottom) == 1, f"{len(bottom)} components that cannot be left"
+    assert bottom[0] & home, "the component that cannot be left has no home marking"
+
+
+# Safety, reduced scope (ADR 0013 rewords S5 and S6). Each property is a condition on every
+# reachable marking or on every edge of the graph. "Runs" means the operation's `*_started` place
+# is marked. If a net change breaks a property and the fix has to wait, mark its test
+# xfail(strict=True, raises=AssertionError) with the issue ID from the model README, so that the
+# fix is noticed when it lands.
+ACTIVE_PREFIXES = ("recipe__",)
+ACTIVE_SUFFIXES = ("_started", "_ended", "_failed")
+
+
+def labelled_edges(report: str) -> list[tuple[int, str, int]]:
+    graph = section(report, "REACHABILITY GRAPH:", "LIVENESS ANALYSIS")
+    out = []
+    for m in re.finditer(r"^(\d+) -> (.*)$", graph, re.M):
+        for edge in m.group(2).split(", "):
+            transition, _, target = edge.rpartition("/")
+            out.append((int(m.group(1)), transition, int(target)))
+    return out
+
+
+def drink_active(tokens: dict[str, int]) -> bool:
+    return any(p.startswith(ACTIVE_PREFIXES) or p.endswith(ACTIVE_SUFFIXES) for p in tokens)
+
+
+def violations(marks, condition) -> list[dict[str, int]]:
+    return [tokens for tokens in marks.values() if condition(tokens)]
+
+
+def input_arcs(transition: str) -> set[str]:
+    """Places with an ordinary (not inhibitor) arc into the transition, read from the .ndr file."""
+    places = set()
+    for line in NET.read_text(encoding="utf-8").splitlines():
+        fields = line.split()
+        if fields[:1] != ["e"] or fields[-2].startswith("?"):
+            continue
+        names = [f for f in fields[1:-2] if not re.fullmatch(r"-?[\d.]+", f)]
+        if names[-1] == transition:
+            places.add(names[0])
+    return places
+
+
+def test_s1_pump_never_runs_without_water(graph):
+    marks = graph[0]
+    bad = violations(marks, lambda m: "brewing_started" in m and "water_available" not in m)
+    assert not bad, f"{len(bad)} markings, e.g. {bad[0]}"
+
+
+def test_s2_pump_never_runs_without_a_cup(graph):
+    # The reduced scope has a fixed cup (ADR 0013): it is always there, empty or full.
+    marks = graph[0]
+    bad = violations(marks, lambda m: ("cup__empty" in m) == ("cup__full" in m))
+    assert not bad, f"{len(bad)} markings without exactly one cup state, e.g. {bad[0]}"
+
+
+def test_s3_steamer_never_runs_without_milk(graph):
+    marks = graph[0]
+    bad = violations(marks, lambda m: "steam_started" in m and "milk_available" not in m)
+    assert not bad, f"{len(bad)} markings, e.g. {bad[0]}"
+
+
+def test_s4_grinder_never_runs_with_a_full_grounds_container(graph):
+    marks = graph[0]
+    bad = violations(marks, lambda m: "grinding_started" in m and "bin_space_available" not in m)
+    assert not bad, f"{len(bad)} markings, e.g. {bad[0]}"
+
+
+@pytest.mark.parametrize(
+    ("transition", "permit"),
+    [
+        ("CE__start_grind", "beans_available"),
+        ("CE__restart_grind", "beans_available"),
+        ("CE__start_brew", "water_available"),
+        ("CE__restart_brew", "water_available"),
+        ("CE__add_hot_water", "water_available"),
+        ("CE__start_steam", "milk_available"),
+        ("CE__restart_steam", "milk_available"),
+    ],
+)
+def test_s5_operations_start_only_with_their_permit(transition, permit):
+    # S5 as reworded in ADR 0013, read as a guard on starting. That the permit stays available
+    # while the operation runs is S1 and S3.
+    assert permit in input_arcs(transition), f"{transition} does not take {permit}"
+
+
+def test_s6_no_order_while_a_drink_is_active(graph, reachability):
+    marks = graph[0]
+    _, report = reachability
+    bad = [
+        (t, marks[source])
+        for source, t, _ in labelled_edges(report)
+        if t.startswith("OE__order_") and drink_active(marks[source])
+    ]
+    assert not bad, f"{len(bad)} orders accepted during a drink, e.g. {bad[0]}"
+
+
+def transition_labels() -> dict[str, str]:
+    """Transition name -> label, read from the .ndr file."""
+    out = {}
+    for line in NET.read_text(encoding="utf-8").splitlines():
+        fields = line.split()
+        if fields[:1] == ["t"]:
+            out[fields[3]] = fields[8]
+    return out
+
+
+def test_next_state_is_a_function(reachability):
+    # next_state(s, e) fires the transition labelled e. It is only well defined if no marking
+    # enables two transitions with the same label (docs/domain/semantics.md).
+    _, report = complete(reachability)
+    labels = transition_labels()
+    enabled: dict[tuple[int, str], set[str]] = {}
+    for source, transition, _ in labelled_edges(report):
+        enabled.setdefault((source, labels[transition]), set()).add(transition)
+    bad = {key: names for key, names in enabled.items() if len(names) > 1}
+    assert not bad, f"{len(bad)} markings enable two transitions with one label, e.g. {bad}"

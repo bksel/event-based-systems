@@ -31,4 +31,5 @@ Allowed statuses: `proposed`, `accepted`, `rejected`, `deprecated`, `superseded`
 | [0010](0010-fault-classes-blocked-resources-and-fault-exits.md) | Fault classes, blocked resources and fault exits | proposed |
 | [0011](0011-bounds-for-analysis-and-simulation.md) | Bounds for analysis and simulation | proposed |
 | [0012](0012-simulator-architecture.md) | Simulator architecture | proposed |
-| [0013](0013-reduce-the-model-scope.md) | Reduce the model scope | proposed |
+| [0013](0013-reduce-the-model-scope.md) | Reduce the model scope | accepted |
+| [0014](0014-align-the-simulator-with-the-reduced-net.md) | Align the simulator with the reduced net | accepted |

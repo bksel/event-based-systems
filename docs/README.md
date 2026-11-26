@@ -12,6 +12,7 @@ Run `just kb` to check that links and ADRs are consistent.
 - [State](domain/state.md): the state tuple `s = (m, r, c, d, F, p)`, the initial and home states
 - [Events](domain/events.md): the catalogue of observable and controllable events, fault/service pairs
 - [Drinks and resources](domain/drinks-and-resources.md): `R(k)`, `B(f)`, drink availability
+- [Semantics](domain/semantics.md): `EF`, `next_state` and `safe` in the reduced scope, as the net defines them
 - [Glossary](domain/glossary.md)
 
 ## Requirements
@@ -31,6 +32,8 @@ Run `just kb` to check that links and ADRs are consistent.
 ## Project
 
 - [Work plan](project/workplan.md): tasks, owners, milestones
+- [Taskboard](project/taskboard.md): who does what by when, kept current by BK
+- [Scope alignment plan](project/scope-alignment-plan.md): aligning the simulator with the reduced net (ADR 0013)
 - [Meeting notes](meetings/README.md)
 
 ## Writing rules

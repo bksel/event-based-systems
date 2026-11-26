@@ -93,7 +93,7 @@ institutional) account. Check what our accounts allow. See
 
 ## Q9. Reduced model scope
 
-*Status:* open · *Owner:* BK (verify the net), then all
+*Status:* resolved, scope reduced ([ADR 0013](decisions/0013-reduce-the-model-scope.md)) · *Owner:* BK (verify the net), then all
 
 KP's Petri net leaves out descaling, rinsing, milk cleaning, several faults, cup removal and
 order rejection. Do we reduce the agreed scope to match the net, or extend the net? This would
@@ -102,7 +102,7 @@ change ADRs agreed with the supervisor. See
 
 ## Q10. Checking L1 with Tina
 
-*Status:* open · *Owner:* BK, KP (T4)
+*Status:* resolved · *Owner:* BK, KP (T4)
 
 Tina's "reversible" result means that the initial marking `s0` is a home marking. Our home state
 `sh` is not `s0`, because the machine starts `off` and never returns to it. How do we show that
@@ -111,3 +111,42 @@ Tina's "reversible" result means that the initial marking `s0` is a home marking
 markings after power-on form one strongly connected component that contains `sh`. See
 [ADR 0007](decisions/0007-petri-net-analysis-tool.md) and the
 [net's verification status](../model/README.md#verification-status).
+
+**Answer:** a test reads the reachability report. It checks that a home marking is reachable from
+every marking, and that the graph has exactly one component that cannot be left, containing a
+home marking. Both hold. See the
+[net's verification status](../model/README.md#verification-status) and
+`tests/test_petri_net.py`.
+
+## Q11. Policies to compare in the reduced scope
+
+*Status:* resolved ([ADR 0014](decisions/0014-align-the-simulator-with-the-reduced-net.md), D5) · *Owner:* BK, MS (T7)
+
+[ADR 0013](decisions/0013-reduce-the-model-scope.md) removes conflicts C3 and C4, so only
+[C1 and C2](requirements/properties.md#prioritization-conflicts) are left, and neither looks
+like a real trade-off:
+
+- **C1.** Every drink brews first, so the next drink always needs `brew`. Going back to `brew`
+  at once cannot make E1 worse, and waiting does not save a temperature change (E2). The net
+  also allows only one choice: `CE__heat_to_brew_from_steam` needs a pending order, so a policy that goes
+  back to `brew` while idle produces traces that the net rejects.
+- **C2.** Grinding during heating can only shorten preparation (E1). The net allows both
+  orders.
+
+The current `FixedOrderPolicy` already makes the eager choice in both, so the baseline is
+already the best policy for E1. This follows from the model and has not been checked by
+simulation yet.
+
+Which comparison do we report in M3? Options:
+
+1. Add a metric that makes C2 a trade-off: grounds wasted when a fault (e.g. `water_empty`)
+   arrives after grinding, against preparation time. Depends on what happens to a failed
+   drink.
+2. Add a cost for keeping the boiler hot, and a standby rule after inactivity. This adds a new
+   conflict to the model and the net.
+3. Keep C1 and C2 as they are and explain in M3 why one policy dominates.
+
+**Answer:** C1 stays as the net fixes it. We compare a baseline that grinds after heating with an
+optimised policy that grinds during heating (C2), measured with E1–E3. Option 1 does not work:
+a failed operation restarts after the service event, so no grounds are wasted. See
+[ADR 0014](decisions/0014-align-the-simulator-with-the-reduced-net.md).
