@@ -102,7 +102,7 @@ change ADRs agreed with the supervisor. See
 
 ## Q10. Checking L1 with Tina
 
-*Status:* open · *Owner:* BK, KP (T4)
+*Status:* resolved · *Owner:* BK, KP (T4)
 
 Tina's "reversible" result means that the initial marking `s0` is a home marking. Our home state
 `sh` is not `s0`, because the machine starts `off` and never returns to it. How do we show that
@@ -111,6 +111,12 @@ Tina's "reversible" result means that the initial marking `s0` is a home marking
 markings after power-on form one strongly connected component that contains `sh`. See
 [ADR 0007](decisions/0007-petri-net-analysis-tool.md) and the
 [net's verification status](../model/README.md#verification-status).
+
+**Answer:** a test reads the reachability report. It checks that a home marking is reachable from
+every marking, and that the graph has exactly one component that cannot be left, containing a
+home marking. Both hold. See the
+[net's verification status](../model/README.md#verification-status) and
+`tests/test_petri_net.py`.
 
 ## Q11. Policies to compare in the reduced scope
 

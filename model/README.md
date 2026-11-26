@@ -24,13 +24,30 @@ faults. The [KB](../docs/README.md) still describes the earlier scope until it i
 | Reachability graph complete and bounded | ✓ 18,716 states |
 | No deadlocks (L2) | ✓ |
 | Every transition can fire | ✓ |
+| L1: a home marking is reachable from every marking | ✓ 61 home markings, every marking reaches one |
+| L1, strong form: one component that cannot be left, and it contains a home marking | ✓ 18,480 markings, 60 of the 61 home markings |
+
+**L1** (checked on 2026-11-26, method from [Q10](../docs/open-questions.md#q10-checking-l1-with-tina)).
+The tests read the markings, the edges and the strongly connected components from Tina's
+reachability report. A **home marking** is one where only these places are marked: `drink_done`,
+`brew_unit__empty`, `cup__empty`, `pump__idle`, `water_available`, `milk_available` (one token
+each), and the counters and the boiler places (any value). So the machine is on, has no order,
+nothing is running and no fault is active. Results:
+
+- Every one of the 18,716 reachable markings can reach a home marking.
+- The graph has one component that cannot be left (18,480 markings). Every marking leads into
+  it, so each of the 60 home markings inside it can be reached again from every reachable
+  marking: it is a home marking of the net in Tina's sense.
+- The 61st home marking is the one right after `OE__power_on`, with the boiler `cold`. It is
+  never reached again, because the boiler does not return to `cold`. For the same reason
+  `OE__power_on` and `CE__heat_to_brew` are the two transitions that are not live.
+- Tina's "not reversible" refers to the initial marking (machine off), which is never reached
+  again after power-on. It does not contradict L1.
+- The net lets every transition fire, so "once the user performs the service actions" in L1 is
+  covered: the service transitions are part of the graph.
 
 Not verified yet (**open**):
 
-- **L1, the home state.** Tina's "reversible" means that the initial marking `s0` (machine off)
-  is a home marking, and `s0` is never reached again after power-on. L1 is about the home state
-  `sh`, so it needs a separate check. The method still has to be worked out:
-  [Q10](../docs/open-questions.md#q10-checking-l1-with-tina).
 - **Safety S1–S6.** These are not yet written as properties that Tina can check (e.g. with
   `selt`).
 - **P-invariants.** `struct` reports that the net is not covered by P-invariants. Which places are

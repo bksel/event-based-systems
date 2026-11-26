@@ -94,3 +94,85 @@ def test_every_transition_can_fire(reachability):
     match = re.search(r"(\d+) dead transition\(s\)", report)
     assert match, report[-2000:]
     assert match.group(1) == "0", re.search(r"dead transition\(s\):.*", report).group(0)
+
+
+# L1: recoverability. Home state sh (docs/domain/state.md): switched on, no order, no faults.
+# As a marking: only these places are marked, the ones in HOME_ONE with one token each. The
+# counters and the boiler may have any value. A place not listed (a recipe stage, an operation
+# in progress, a fault) makes the marking not a home marking.
+HOME_ONE = {"drink_done", "brew_unit__empty", "cup__empty", "pump__idle"} | {
+    "water_available",
+    "milk_available",
+}
+HOME_ANY = {"beans_available", "bin_space_available", "boiler__cold", "boiler__brew"} | {
+    "boiler__steam"
+}
+
+
+def section(report: str, start: str, end: str) -> str:
+    begin = report.index(start)
+    return report[begin : report.index(end, begin)]
+
+
+def markings(report: str) -> dict[int, dict[str, int]]:
+    out = {}
+    for m in re.finditer(
+        r"^(\d+) : (.*)$", section(report, "MARKINGS:", "REACHABILITY GRAPH:"), re.M
+    ):
+        tokens = {}
+        for item in m.group(2).split():
+            place, _, n = item.partition("*")
+            tokens[place] = int(n or 1)
+        out[int(m.group(1))] = tokens
+    return out
+
+
+def successors(report: str) -> dict[int, set[int]]:
+    graph = section(report, "REACHABILITY GRAPH:", "LIVENESS ANALYSIS")
+    out = {}
+    for m in re.finditer(r"^(\d+) -> (.*)$", graph, re.M):
+        out[int(m.group(1))] = {int(edge.rpartition("/")[2]) for edge in m.group(2).split(", ")}
+    return out
+
+
+def components(report: str) -> list[set[int]]:
+    sccs = report[report.index("STRONG CONNECTED COMPONENTS:") :]
+    return [set(map(int, m.group(1).split())) for m in re.finditer(r"^\d+ : ([\d ]+)$", sccs, re.M)]
+
+
+def is_home(tokens: dict[str, int]) -> bool:
+    return set(tokens) <= HOME_ONE | HOME_ANY and all(tokens.get(p) == 1 for p in HOME_ONE)
+
+
+@pytest.fixture(scope="module")
+def graph(reachability):
+    _, report = complete(reachability)
+    marks = markings(report)
+    home = {s for s, tokens in marks.items() if is_home(tokens)}
+    return marks, successors(report), components(report), home
+
+
+def test_home_state_is_reachable_from_every_marking(graph):  # L1
+    marks, succ, _, home = graph
+    assert home, "no reachable marking is a home marking"
+    pred: dict[int, set[int]] = {s: set() for s in marks}
+    for s, targets in succ.items():
+        for t in targets:
+            pred[t].add(s)
+    reaches_home, todo = set(home), list(home)
+    while todo:
+        for p in pred[todo.pop()] - reaches_home:
+            reaches_home.add(p)
+            todo.append(p)
+    stuck = sorted(set(marks) - reaches_home)
+    assert not stuck, f"{len(stuck)} markings cannot reach sh, e.g. {marks[stuck[0]]}"
+
+
+def test_some_home_marking_is_reachable_from_everywhere(graph):  # L1, the strong form
+    # A finite graph always ends in a component it cannot leave. With exactly one such
+    # component, every marking can reach all of it, so a home marking in it is a home marking
+    # of the net in Tina's sense.
+    _, succ, sccs, home = graph
+    bottom = [c for c in sccs if all(succ.get(s, set()) <= c for s in c)]
+    assert len(bottom) == 1, f"{len(bottom)} components that cannot be left"
+    assert bottom[0] & home, "the component that cannot be left has no home marking"
